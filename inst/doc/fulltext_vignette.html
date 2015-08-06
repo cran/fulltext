@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>fulltext introduction</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{fulltext introduction}
+%\VignetteEncoding{UTF-8}
+-->
+
+<h1>fulltext introduction</h1>
+
+<p><code>fulltext</code> is a package to facilitate text mining. It focuses on open access journals. This package makes it easier to search for articles, download those articles in full text if available, convert pdf format to plain text, and extract text chunks for vizualization/analysis. We are planning to add bits for analysis in future versions. The steps in bullet form:</p>
+
+<ul>
+<li>Search</li>
+<li>Retrieve</li>
+<li>Convert</li>
+<li>Text</li>
+<li>Extract</li>
+</ul>
+
+<h2>Load fulltext</h2>
+
+<pre><code class="r">library(&quot;fulltext&quot;)
+</code></pre>
+
+<h2>Search for articles</h2>
+
+<p>Search for the term <em>ecology</em> in PLOS journals.</p>
+
+<pre><code class="r">(res1 &lt;- ft_search(query = &#39;ecology&#39;, from = &#39;plos&#39;))
+</code></pre>
+
+<pre><code>## Query:
+##   [ecology] 
+## Found:
+##   [PLoS: 28561; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0] 
+## Returned:
+##   [PLoS: 10; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0]
+</code></pre>
+
+<p>Each publisher/search-engine has a slot with metadata and data</p>
+
+<pre><code class="r">res1$plos
+</code></pre>
+
+<pre><code>## Query: [ecology] 
+## Records found, returned: [28561, 10] 
+## License: [CC-BY] 
+##                                                         id
+## 1                             10.1371/journal.pone.0059813
+## 2                             10.1371/journal.pone.0001248
+## 3  10.1371/annotation/69333ae7-757a-4651-831c-f28c5eb02120
+## 4                             10.1371/journal.pone.0080763
+## 5                             10.1371/journal.pone.0102437
+## 6                             10.1371/journal.pone.0017342
+## 7                             10.1371/journal.pone.0091497
+## 8                             10.1371/journal.pone.0092931
+## 9  10.1371/annotation/28ac6052-4f87-4b88-a817-0cd5743e83d6
+## 10                            10.1371/journal.pcbi.1003594
+</code></pre>
+
+<h2>Get full text</h2>
+
+<p>Using the results from <code>ft_search()</code> we can grab full text of some articles</p>
+
+<pre><code class="r">(out &lt;- ft_get(res1))
+</code></pre>
+
+<pre><code>## [Docs] 8 
+## [Source] R session  
+## [IDs] 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
+##      10.1371/journal.pone.0080763 10.1371/journal.pone.0102437
+##      10.1371/journal.pone.0017342 10.1371/journal.pone.0091497
+##      10.1371/journal.pone.0092931 10.1371/journal.pcbi.1003594 ...
+</code></pre>
+
+<p>Dig in to the PLOS data</p>
+
+<pre><code class="r">out$plos
+</code></pre>
+
+<pre><code>## $found
+## [1] 8
+## 
+## $dois
+## [1] &quot;10.1371/journal.pone.0059813&quot; &quot;10.1371/journal.pone.0001248&quot;
+## [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0102437&quot;
+## [5] &quot;10.1371/journal.pone.0017342&quot; &quot;10.1371/journal.pone.0091497&quot;
+## [7] &quot;10.1371/journal.pone.0092931&quot; &quot;10.1371/journal.pcbi.1003594&quot;
+## 
+## $data
+## $data$backend
+## NULL
+## 
+## $data$path
+## [1] &quot;session&quot;
+## 
+## $data$data
+## 8 full-text articles retrieved 
+## Min. Length: 3828 - Max. Length: 104702 
+## DOIs: 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
+##   10.1371/journal.pone.0080763 10.1371/journal.pone.0102437
+##   10.1371/journal.pone.0017342 10.1371/journal.pone.0091497
+##   10.1371/journal.pone.0092931 10.1371/journal.pcbi.1003594 ... 
+## 
+## NOTE: extract xml strings like output[&#39;&lt;doi&gt;&#39;]
+## 
+## $opts
+## $opts$doi
+## [1] &quot;10.1371/journal.pone.0059813&quot; &quot;10.1371/journal.pone.0001248&quot;
+## [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0102437&quot;
+## [5] &quot;10.1371/journal.pone.0017342&quot; &quot;10.1371/journal.pone.0091497&quot;
+## [7] &quot;10.1371/journal.pone.0092931&quot; &quot;10.1371/journal.pcbi.1003594&quot;
+## 
+## $opts$callopts
+## list()
+</code></pre>
+
+<p>Dig in further to get to one of the articles in XML format</p>
+
+<pre><code class="r">library(&quot;xml2&quot;)
+xml2::read_xml(out$plos$data$data$`10.1371/journal.pone.0059813`)
+</code></pre>
+
+<pre><code>## {xml_document}
+## &lt;article&gt;
+## [1] &lt;front&gt;\n&lt;journal-meta&gt;\n&lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt;PLoS O ...
+## [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n&lt;title&gt;Introduction&lt;/title&gt;\n&lt;p&gt;Ecologists  ...
+## [3] &lt;back&gt;\n&lt;ack&gt;\n&lt;p&gt;Curtis Flather, Mark Burgman, Leon Blaustein, Yaac ...
+</code></pre>
+
+<h2>Extract text from pdfs</h2>
+
+<p>Ideally for text mining you have access to XML or other text based formats. However, sometimes you only have access to PDFs. In this case you want to extract text from PDFs. <code>fulltext</code> can help with that. </p>
+
+<p>You can extract from any pdf from a file path, like:</p>
+
+<pre><code class="r">path &lt;- system.file(&quot;examples&quot;, &quot;example1.pdf&quot;, package = &quot;fulltext&quot;)
+ft_extract(path)
+</code></pre>
+
+<pre><code>## &lt;document&gt;/Library/Frameworks/R.framework/Versions/3.2/Resources/library/fulltext/examples/example1.pdf
+##   Pages: 18
+##   Title: Suffering and mental health among older people living in nursing homes---a mixed-methods study
+##   Producer: pdfTeX-1.40.10
+##   Creation date: 2015-07-17
+</code></pre>
+
+<p>Let&#39;s search for articles from arXiv, a preprint service. Here, get pdf from an article with ID <code>cond-mat/9309029</code>:</p>
+
+<pre><code class="r">res &lt;- ft_get(&#39;cond-mat/9309029&#39;, from = &quot;arxiv&quot;)
+res2 &lt;- ft_extract(res)
+res2$arxiv$data
+</code></pre>
+
+<pre><code>## $backend
+## NULL
+## 
+## $path
+## $path$`cond-mat/9309029`
+## [1] &quot;~/.fulltext/cond-mat_9309029.pdf&quot;
+## 
+## 
+## $data
+## $data[[1]]
+## &lt;document&gt;/Users/sacmac/.fulltext/cond-mat_9309029.pdf
+##   Pages: 14
+##   Title: arXiv:cond-mat/9309029v8  26 Jan 1994
+##   Producer: GPL Ghostscript SVN PRE-RELEASE 8.62
+##   Creation date: 2008-02-06
+</code></pre>
+
+<p>And a short snippet of the full text</p>
+
+<pre><code class="r">res2$arxiv$data$data[[1]]$data
+#&gt; &quot;arXiv:cond-mat/9309029v8 26 Jan 1994, , FERMILAB-PUB-93/15-T March 1993, Revised:
+#&gt; January 1994, The Thermodynamics and Economics of Waste, Dallas C. Kennedy, Research
+#&gt; Associate, Fermi National Accelerator Laboratory, P.O. Box 500 MS106, Batavia, Illinois
+#&gt; 60510 USA, Abstract, The increasingly relevant problem of natural resource use and
+#&gt; waste production, disposal, and reuse is examined from several viewpoints: economic,
+#&gt; technical, and thermodynamic. Alternative economies are studied, with emphasis on
+#&gt; recycling of waste to close the natural resource cycle. The physical nature of human
+#&gt; economies and constraints on recycling and energy efficiency are stated in terms 
+#&gt; ...&quot;
+</code></pre>
+
+<h2>Extract text chunks</h2>
+
+<p>We have a few functions to help you pull out certain parts of an article. For example, perhaps you want to get just the authors from your articles, or just the abstracts. </p>
+
+<p>Here, we&#39;ll search for some PLOS articles, then get their full text, then extract various parts of each article with <code>chunks()</code>.</p>
+
+<pre><code class="r">res &lt;- ft_search(query = &quot;ecology&quot;, from = &quot;plos&quot;)
+(x &lt;- ft_get(res))
+</code></pre>
+
+<pre><code>## [Docs] 8 
+## [Source] R session  
+## [IDs] 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248 10.1371/journal.pone.0080763
+##      10.1371/journal.pone.0102437 10.1371/journal.pone.0017342 10.1371/journal.pone.0091497
+##      10.1371/journal.pone.0092931 10.1371/journal.pcbi.1003594 ...
+</code></pre>
+
+<p>Extract DOIs</p>
+
+<pre><code class="r">x %&gt;% chunks(&quot;doi&quot;)
+</code></pre>
+
+<pre><code>## $plos
+## $plos$`10.1371/journal.pone.0059813`
+## $plos$`10.1371/journal.pone.0059813`$doi
+## [1] &quot;10.1371/journal.pone.0059813&quot;
+## 
+## 
+## $plos$`10.1371/journal.pone.0001248`
+## $plos$`10.1371/journal.pone.0001248`$doi
+## [1] &quot;10.1371/journal.pone.0001248&quot;
+## 
+## 
+## $plos$`10.1371/journal.pone.0080763`
+## $plos$`10.1371/journal.pone.0080763`$doi
+## [1] &quot;10.1371/journal.pone.0080763&quot;
+## 
+## 
+## $plos$`10.1371/journal.pone.0102437`
+## $plos$`10.1371/journal.pone.0102437`$doi
+## [1] &quot;10.1371/journal.pone.0102437&quot;
+## 
+## 
+## $plos$`10.1371/journal.pone.0017342`
+## $plos$`10.1371/journal.pone.0017342`$doi
+## [1] &quot;10.1371/journal.pone.0017342&quot;
+## 
+## 
+## $plos$`10.1371/journal.pone.0091497`
+## $plos$`10.1371/journal.pone.0091497`$doi
+## [1] &quot;10.1371/journal.pone.0091497&quot;
+## 
+## 
+## $plos$`10.1371/journal.pone.0092931`
+## $plos$`10.1371/journal.pone.0092931`$doi
+## [1] &quot;10.1371/journal.pone.0092931&quot;
+## 
+## 
+## $plos$`10.1371/journal.pcbi.1003594`
+## $plos$`10.1371/journal.pcbi.1003594`$doi
+## [1] &quot;10.1371/journal.pcbi.1003594&quot;
+</code></pre>
+
+<p>Extract DOIs and categories</p>
+
+<pre><code class="r">x %&gt;% chunks(c(&quot;doi&quot;,&quot;categories&quot;))
+</code></pre>
+
+<pre><code>## $plos
+## $plos$`10.1371/journal.pone.0059813`
+## $plos$`10.1371/journal.pone.0059813`$doi
+## [1] &quot;10.1371/journal.pone.0059813&quot;
+## 
+## $plos$`10.1371/journal.pone.0059813`$categories
+##  [1] &quot;Research Article&quot;                 &quot;Biology&quot;                          &quot;Ecology&quot;                         
+##  [4] &quot;Community ecology&quot;                &quot;Species interactions&quot;             &quot;Science policy&quot;                  
+##  [7] &quot;Research assessment&quot;              &quot;Research monitoring&quot;              &quot;Research funding&quot;                
+## [10] &quot;Government funding of science&quot;    &quot;Research laboratories&quot;            &quot;Science policy and economics&quot;    
+## [13] &quot;Science and technology workforce&quot; &quot;Careers in research&quot;              &quot;Social and behavioral sciences&quot;  
+## [16] &quot;Sociology&quot;                        &quot;Sociology of knowledge&quot;          
+## 
+## 
+## $plos$`10.1371/journal.pone.0001248`
+## $plos$`10.1371/journal.pone.0001248`$doi
+## [1] &quot;10.1371/journal.pone.0001248&quot;
+## 
+## $plos$`10.1371/journal.pone.0001248`$categories
+## [1] &quot;Research Article&quot;             &quot;Ecology&quot;                      &quot;Ecology/Ecosystem Ecology&quot;   
+## [4] &quot;Ecology/Evolutionary Ecology&quot; &quot;Ecology/Theoretical Ecology&quot; 
+## 
+## 
+## $plos$`10.1371/journal.pone.0080763`
+## $plos$`10.1371/journal.pone.0080763`$doi
+## [1] &quot;10.1371/journal.pone.0080763&quot;
+## 
+## $plos$`10.1371/journal.pone.0080763`$categories
+##  [1] &quot;Research Article&quot;     &quot;Biology&quot;              &quot;Ecology&quot;              &quot;Autecology&quot;          
+##  [5] &quot;Behavioral ecology&quot;   &quot;Community ecology&quot;    &quot;Evolutionary ecology&quot; &quot;Population ecology&quot;  
+##  [9] &quot;Evolutionary biology&quot; &quot;Behavioral ecology&quot;   &quot;Evolutionary ecology&quot; &quot;Population biology&quot;  
+## [13] &quot;Population ecology&quot;  
+## 
+## 
+## $plos$`10.1371/journal.pone.0102437`
+## $plos$`10.1371/journal.pone.0102437`$doi
+## [1] &quot;10.1371/journal.pone.0102437&quot;
+## 
+## $plos$`10.1371/journal.pone.0102437`$categories
+##  [1] &quot;Research Article&quot;                   &quot;Biology and life sciences&quot;          &quot;Biogeography&quot;                      
+##  [4] &quot;Ecology&quot;                            &quot;Ecosystems&quot;                         &quot;Ecosystem engineering&quot;             
+##  [7] &quot;Ecosystem functioning&quot;              &quot;Industrial ecology&quot;                 &quot;Spatial and landscape ecology&quot;     
+## [10] &quot;Urban ecology&quot;                      &quot;Computer and information sciences&quot;  &quot;Geoinformatics&quot;                    
+## [13] &quot;Spatial analysis&quot;                   &quot;Earth sciences&quot;                     &quot;Geography&quot;                         
+## [16] &quot;Human geography&quot;                    &quot;Cultural geography&quot;                 &quot;Social geography&quot;                  
+## [19] &quot;Ecology and environmental sciences&quot; &quot;Conservation science&quot;               &quot;Environmental protection&quot;          
+## [22] &quot;Nature-society interactions&quot;       
+## 
+## 
+## $plos$`10.1371/journal.pone.0017342`
+## $plos$`10.1371/journal.pone.0017342`$doi
+## [1] &quot;10.1371/journal.pone.0017342&quot;
+## 
+## $plos$`10.1371/journal.pone.0017342`$categories
+##  [1] &quot;Research Article&quot;     &quot;Biology&quot;              &quot;Ecology&quot;              &quot;Community ecology&quot;   
+##  [5] &quot;Community assembly&quot;   &quot;Community structure&quot;  &quot;Niche construction&quot;   &quot;Ecological metrics&quot;  
+##  [9] &quot;Species diversity&quot;    &quot;Species richness&quot;     &quot;Biodiversity&quot;         &quot;Biogeography&quot;        
+## [13] &quot;Population ecology&quot;   &quot;Mathematics&quot;          &quot;Statistics&quot;           &quot;Biostatistics&quot;       
+## [17] &quot;Statistical theories&quot; &quot;Ecology&quot;              &quot;Mathematics&quot;         
+## 
+## 
+## $plos$`10.1371/journal.pone.0091497`
+## $plos$`10.1371/journal.pone.0091497`$doi
+## [1] &quot;10.1371/journal.pone.0091497&quot;
+## 
+## $plos$`10.1371/journal.pone.0091497`$categories
+## [1] &quot;Correction&quot;
+## 
+## 
+## $plos$`10.1371/journal.pone.0092931`
+## $plos$`10.1371/journal.pone.0092931`$doi
+## [1] &quot;10.1371/journal.pone.0092931&quot;
+## 
+## $plos$`10.1371/journal.pone.0092931`$categories
+## [1] &quot;Correction&quot;
+## 
+## 
+## $plos$`10.1371/journal.pcbi.1003594`
+## $plos$`10.1371/journal.pcbi.1003594`$doi
+## [1] &quot;10.1371/journal.pcbi.1003594&quot;
+## 
+## $plos$`10.1371/journal.pcbi.1003594`$categories
+## [1] &quot;Research Article&quot;          &quot;Biology and life sciences&quot; &quot;Computational biology&quot;     &quot;Microbiology&quot;             
+## [5] &quot;Theoretical biology&quot;
+</code></pre>
+
+<p><code>tabularize</code> attempts to help you put the data that comes out of <code>chunks()</code> in to a <code>data.frame</code>, that we all know and love. </p>
+
+<pre><code class="r">x %&gt;% chunks(c(&quot;doi&quot;, &quot;history&quot;)) %&gt;% tabularize()
+</code></pre>
+
+<pre><code>## $plos
+##                            doi history.received history.accepted
+## 1 10.1371/journal.pone.0059813       2012-09-16       2013-02-19
+## 2 10.1371/journal.pone.0001248       2007-07-02       2007-11-06
+## 3 10.1371/journal.pone.0080763       2013-08-15       2013-10-16
+## 4 10.1371/journal.pone.0102437       2013-11-27       2014-06-19
+## 5 10.1371/journal.pone.0017342       2010-08-24       2011-01-31
+## 6 10.1371/journal.pone.0091497             &lt;NA&gt;             &lt;NA&gt;
+## 7 10.1371/journal.pone.0092931             &lt;NA&gt;             &lt;NA&gt;
+## 8 10.1371/journal.pcbi.1003594       2014-01-09       2014-03-14
+</code></pre>
+
+</body>
+
+</html>
