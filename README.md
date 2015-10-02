@@ -15,6 +15,7 @@ __Get full text across all da (open access) journals__
 [![Build status](https://ci.appveyor.com/api/projects/status/y487h3ec5wc2s20m/branch/master?svg=true)](https://ci.appveyor.com/project/sckott/fulltext/branch/master)
 [![codecov.io](https://codecov.io/github/ropensci/fulltext/coverage.svg?branch=master)](https://codecov.io/github/ropensci/fulltext?branch=master)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/fulltext)](https://github.com/metacran/cranlogs.app)
+[![cran version](http://www.r-pkg.org/badges/version/fulltext)](http://cran.rstudio.com/web/packages/fulltext)
 
 rOpenSci has a number of R packages to get either full text, metadata, or both from various publishers. The goal of `fulltext` is to integrate these packages to create a single interface to many data sources.
 
@@ -22,6 +23,7 @@ rOpenSci has a number of R packages to get either full text, metadata, or both f
 
 * Search for articles
 * Fetch articles
+* Get links for full text articles (xml, pdf)
 * Extract text from articles / convert formats
 * Collect bits of articles that you actually need
 
@@ -29,6 +31,8 @@ Additional steps we hope to include in future versions:
 
 * Analysis enable via the [tm](https://cran.rstudio.com/web/packages/tm/) package and friends, or via [Spark-R](https://amplab-extras.github.io/SparkR-pkg/)
 * Visualization
+
+You can also download supplementary materials from papers.
 
 Data sources in `fulltext` include:
 
@@ -69,6 +73,14 @@ Load library
 library('fulltext')
 ```
 
+## Extraction tools
+
+If you want to use `ft_extract()` function, it currently has two options for how to extract text from PDFs: `xpdf` and `ghostscript`. 
+
+* `xpdf` installation: See http://www.foolabs.com/xpdf/download.html for instructions on how to download and install `xpdf`. For OSX, you an also get `xpdf` via [Homebrew](https://github.com/homebrew/homebrew-x11/blob/master/xpdf.rb) with `brew install xpdf`. Apparently, you can optionally install Poppler, which is built on `xpdf`. Get it at http://poppler.freedesktop.org/
+* `ghostscript` installation: See http://www.ghostscript.com/doc/9.16/Install.htm  
+for instructions on how to download and install `ghostscript`. For OSX, you an also get `ghostscript` via [Homebrew](https://github.com/Homebrew/homebrew/blob/master/Library/Formula/ghostscript.rb) with `brew install gs`.
+
 ## Search
 
 `ft_search()` - get metadata on a search query.
@@ -79,9 +91,32 @@ ft_search(query = 'ecology', from = 'plos')
 #> Query:
 #>   [ecology] 
 #> Found:
-#>   [PLoS: 28561; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0] 
+#>   [PLoS: 29496; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0] 
 #> Returned:
 #>   [PLoS: 10; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0]
+```
+
+## Get full text links
+
+`ft_links()` - get links for articles (xml and pdf).
+
+
+```r
+res1 <- ft_search(query = 'ecology', from = 'entrez', limit = 5)
+ft_links(res1)
+#> <fulltext links>
+#> [Found] 4 
+#> [IDs] ID_26420471 ID_26419522 ID_26419355 ID_26419232 ...
+```
+
+Or pass in DOIs directly
+
+
+```r
+ft_links(res1$entrez$data$doi, from = "entrez")
+#> <fulltext links>
+#> [Found] 4 
+#> [IDs] ID_26420471 ID_26419522 ID_26419355 ID_26419232 ...
 ```
 
 ## Get full text
@@ -91,6 +126,7 @@ ft_search(query = 'ecology', from = 'plos')
 
 ```r
 ft_get('10.1371/journal.pone.0086169', from = 'plos')
+#> <fulltext text>
 #> [Docs] 1 
 #> [Source] R session  
 #> [IDs] 10.1371/journal.pone.0086169 ...
@@ -103,18 +139,18 @@ ft_get('10.1371/journal.pone.0086169', from = 'plos')
 library("rplos")
 (dois <- searchplos(q = "*:*", fl = 'id',
    fq = list('doc_type:full',"article_type:\"research article\""), limit = 5)$data$id)
-#> [1] "10.1371/journal.pone.0031384" "10.1371/journal.pone.0031385"
-#> [3] "10.1371/journal.pone.0107441" "10.1371/journal.pone.0000339"
-#> [5] "10.1371/journal.pone.0046739"
+#> [1] "10.1371/journal.pone.0082888" "10.1371/journal.pone.0133894"
+#> [3] "10.1371/journal.pone.0082883" "10.1371/journal.pone.0050020"
+#> [5] "10.1371/journal.pone.0066417"
 x <- ft_get(dois, from = "plos")
 x %>% chunks("publisher") %>% tabularize()
 #> $plos
 #>                                               publisher
-#> 1 Public Library of Science\n        San Francisco, USA
-#> 2 Public Library of Science\n        San Francisco, USA
-#> 3         Public Library of Science\nSan Francisco, USA
-#> 4           Public Library of ScienceSan Francisco, USA
-#> 5 Public Library of Science\n        San Francisco, USA
+#> 1     Public Library of Science\n    San Francisco, USA
+#> 2      Public Library of Science\nSan Francisco, CA USA
+#> 3     Public Library of Science\n    San Francisco, USA
+#> 4 Public Library of Science\n        San Francisco, USA
+#> 5         Public Library of Science\nSan Francisco, USA
 ```
 
 
@@ -122,17 +158,17 @@ x %>% chunks("publisher") %>% tabularize()
 x %>% chunks(c("doi","publisher")) %>% tabularize()
 #> $plos
 #>                            doi
-#> 1 10.1371/journal.pone.0031384
-#> 2 10.1371/journal.pone.0031385
-#> 3 10.1371/journal.pone.0107441
-#> 4 10.1371/journal.pone.0000339
-#> 5 10.1371/journal.pone.0046739
+#> 1 10.1371/journal.pone.0082888
+#> 2 10.1371/journal.pone.0133894
+#> 3 10.1371/journal.pone.0082883
+#> 4 10.1371/journal.pone.0050020
+#> 5 10.1371/journal.pone.0066417
 #>                                               publisher
-#> 1 Public Library of Science\n        San Francisco, USA
-#> 2 Public Library of Science\n        San Francisco, USA
-#> 3         Public Library of Science\nSan Francisco, USA
-#> 4           Public Library of ScienceSan Francisco, USA
-#> 5 Public Library of Science\n        San Francisco, USA
+#> 1     Public Library of Science\n    San Francisco, USA
+#> 2      Public Library of Science\nSan Francisco, CA USA
+#> 3     Public Library of Science\n    San Francisco, USA
+#> 4 Public Library of Science\n        San Francisco, USA
+#> 5         Public Library of Science\nSan Francisco, USA
 ```
 
 Use `dplyr` to data munge
@@ -146,29 +182,46 @@ x %>%
  .$plos %>%
  select(-permissions.license)
 #>                            doi
-#> 1 10.1371/journal.pone.0031384
-#> 2 10.1371/journal.pone.0031385
-#> 3 10.1371/journal.pone.0107441
-#> 4 10.1371/journal.pone.0000339
-#> 5 10.1371/journal.pone.0046739
+#> 1 10.1371/journal.pone.0082888
+#> 2 10.1371/journal.pone.0133894
+#> 3 10.1371/journal.pone.0082883
+#> 4 10.1371/journal.pone.0050020
+#> 5 10.1371/journal.pone.0066417
 #>                                               publisher
-#> 1 Public Library of Science\n        San Francisco, USA
-#> 2 Public Library of Science\n        San Francisco, USA
-#> 3         Public Library of Science\nSan Francisco, USA
-#> 4           Public Library of ScienceSan Francisco, USA
-#> 5 Public Library of Science\n        San Francisco, USA
+#> 1     Public Library of Science\n    San Francisco, USA
+#> 2      Public Library of Science\nSan Francisco, CA USA
+#> 3     Public Library of Science\n    San Francisco, USA
+#> 4 Public Library of Science\n        San Francisco, USA
+#> 5         Public Library of Science\nSan Francisco, USA
 #>   permissions.copyright.year permissions.copyright.holder
-#> 1                       2012                 Arnold et al
-#> 2                       2012                     Hu, Kuhn
-#> 3                       2014           Peterson, McKenzie
-#> 4                       2007                Shrager et al
-#> 5                       2012                Kapoula et al
+#> 1                       2013                    Jing Wang
+#> 2                       2015               Voorwald et al
+#> 3                       2013        Nejati Javaremi et al
+#> 4                       2012                     Pi et al
+#> 5                       2013                   Wang et al
 #>                       permissions.license_url
-#> 1                                        <NA>
-#> 2                                        <NA>
-#> 3 http://creativecommons.org/licenses/by/4.0/
+#> 1 http://creativecommons.org/licenses/by/4.0/
+#> 2 http://creativecommons.org/licenses/by/4.0/
+#> 3                                        <NA>
 #> 4                                        <NA>
 #> 5                                        <NA>
+```
+
+## Supplementary materials
+
+Grab supplementary materials for (re-)analysis of data
+
+
+```r
+catching.crabs <- read.csv(ft_get_si("10.6084/m9.figshare.979288", 2))
+head(catching.crabs)
+#>   trap.no. length.deployed no..crabs
+#> 1        1          10 sec         0
+#> 2        2          10 sec         0
+#> 3        3          10 sec         0
+#> 4        4          10 sec         0
+#> 5        5          10 sec         0
+#> 6        1           1 min         0
 ```
 
 ## Cache
@@ -196,7 +249,7 @@ Using `ghostscript`
 
 ```r
 (res_gs <- ft_extract(pdf, "gs"))
-#> <document>/Library/Frameworks/R.framework/Versions/3.2/Resources/library/fulltext/examples/example2.pdf
+#> <document>/Users/sacmac/github/ropensci/fulltext/inst/examples/example2.pdf
 #>   Title: pone.0107412 1..10
 #>   Producer: Acrobat Distiller 9.0.0 (Windows); modified using iText 5.0.3 (c) 1T3XT BVBA
 #>   Creation date: 2014-09-18
@@ -207,7 +260,7 @@ Using `xpdf`
 
 ```r
 (res_xpdf <- ft_extract(pdf, "xpdf"))
-#> <document>/Library/Frameworks/R.framework/Versions/3.2/Resources/library/fulltext/examples/example2.pdf
+#> <document>/Users/sacmac/github/ropensci/fulltext/inst/examples/example2.pdf
 #>   Pages: 10
 #>   Title: pone.0107412 1..10
 #>   Producer: Acrobat Distiller 9.0.0 (Windows); modified using iText 5.0.3 (c) 1T3XT BVBA

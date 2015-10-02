@@ -1,12 +1,13 @@
 Package: fulltext
 Title: Full Text of 'Scholarly' Articles Across Many Data Sources
-Description: Provides a single interface to many sources of full
-    text 'scholarly' data, including 'Biomed Central', Public Library of Science,
-    'Pubmed Central', 'eLife', 'F1000Research', 'PeerJ', 'Pensoft', 'Hindawi', 'arXiv'
-    'preprints', and more. Functionality included for searching for articles,
-    downloading full or partial text, converting to various data formats used
-    in and outside of R.
-Version: 0.1.0
+Description: Provides a single interface to many sources of full text
+    'scholarly' data, including 'Biomed Central', Public Library of
+    Science, 'Pubmed Central', 'eLife', 'F1000Research', 'PeerJ',
+    'Pensoft', 'Hindawi', 'arXiv' 'preprints', and more. Functionality
+    included for searching for articles, downloading full or partial
+    text, downloading supplementary materials, converting to various
+    data formats used in and outside of R.
+Version: 0.1.4
 License: MIT + file LICENSE
 Authors@R: person("Scott", "Chamberlain", role = c("aut", "cre"),
     email = "myrmecocystus@gmail.com")
@@ -19,8 +20,8 @@ Imports: methods, utils, stats, httr (>= 1.0.0), magrittr, xml2,
         rredis, R.cache, digest, whisker
 Suggests: roxygen2, testthat, knitr
 NeedsCompilation: no
-Packaged: 2015-08-06 19:33:46 UTC; sacmac
+Packaged: 2015-10-02 00:42:25 UTC; sacmac
 Author: Scott Chamberlain [aut, cre]
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
 Repository: CRAN
-Date/Publication: 2015-08-06 21:58:33
+Date/Publication: 2015-10-02 10:56:57

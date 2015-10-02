@@ -5,7 +5,7 @@ test_that("ft_search returns...", {
   
   aa <- ft_search(query = 'ecology', from = 'plos')
   flds <- c('id','author','eissn','journal','counter_total_all','alm_twitterCount')
-  bb <- ft_search(query = 'climate change', from = 'plos', limit = 500, plosopts = list(fl = flds))
+  bb <- ft_search(query = 'climate change', from = 'plos', plosopts = list(fl = flds))
   cc <- ft_search(query = 'ecology', from = 'crossref')
   dd <- ft_search(query = 'ecology', from = 'biorxiv')
   
@@ -33,8 +33,34 @@ test_that("ft_search returns...", {
   expect_true(cc$crossref$opts$filter[[1]])
   
   expect_is(dd$biorxiv$data, "data.frame")
-  expect_match(dd$biorxiv$data$URL[1], "http")
+  expect_match(dd$biorxiv$data$url[1], "http")
 })
+
+test_that("ft_search works for larger requests", {
+  skip_on_cran()
+  
+  res_entrez <- ft_search(query = 'ecology', from = 'entrez', limit = 200)
+  expect_is(res_entrez, "ft")
+  expect_is(res_entrez$entrez, "ft_ind")
+  expect_equal(NROW(res_entrez$entrez$data), 200)
+  
+  res_plos <- ft_search(query = 'ecology', from = 'plos', limit = 200)
+  expect_is(res_plos, "ft")
+  expect_is(res_plos$plos, "ft_ind")
+  expect_equal(NROW(res_plos$plos$data), 200)
+  
+  res_cr <- ft_search(query = 'ecology', from = 'crossref', limit = 200)
+  expect_is(res_cr, "ft")
+  expect_is(res_cr$crossref, "ft_ind")
+  expect_equal(NROW(res_cr$crossref$data), 200)
+  
+  expect_error(ft_search(query = 'ecology', from = 'entrez', limit = 2000), 
+               "HTTP failure 414, the request is too large")
+  ## FIXME - add catches for plos, other sources
+  expect_error(ft_search(query = 'ecology', from = 'crossref', limit = 2000), 
+               "limit parameter must be 1000 or less")
+})
+
 
 test_that("ft_search fails well", {
   skip_on_cran()
