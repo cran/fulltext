@@ -7,7 +7,7 @@ Description: Provides a single interface to many sources of full text
     included for searching for articles, downloading full or partial
     text, downloading supplementary materials, converting to various
     data formats used in and outside of R.
-Version: 0.1.4
+Version: 0.1.6
 License: MIT + file LICENSE
 Authors@R: person("Scott", "Chamberlain", role = c("aut", "cre"),
     email = "myrmecocystus@gmail.com")
@@ -18,10 +18,11 @@ VignetteBuilder: knitr
 Imports: methods, utils, stats, httr (>= 1.0.0), magrittr, xml2,
         jsonlite, rplos (>= 0.5.2), rcrossref, aRxiv, rentrez, tm,
         rredis, R.cache, digest, whisker
-Suggests: roxygen2, testthat, knitr
+Suggests: testthat, knitr
+RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2015-10-02 00:42:25 UTC; sacmac
+Packaged: 2016-01-22 01:02:51 UTC; sacmac
 Author: Scott Chamberlain [aut, cre]
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
 Repository: CRAN
-Date/Publication: 2015-10-02 10:56:57
+Date/Publication: 2016-01-22 10:26:45

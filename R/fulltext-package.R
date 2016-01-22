@@ -19,6 +19,9 @@
 #'  \item extract text from pdfs - \code{\link{ft_extract}}
 #'  \item serialize to different data formats - \code{\link{ft_serialize}}
 #'  \item extract certain article sections (e.g., authors) - \code{\link{chunks}}
+#'  \item grab supplementary materials for (re-)analysis of data - \code{\link{ft_get_si}}
+#'  accepts article identifiers, and output from \code{\link{ft_search}} and 
+#'  \code{\link{ft_get}}
 #' }
 #' 
 #' @section DOI delays:
@@ -33,7 +36,7 @@
 #' @section Feedback: 
 #' Let us know what you think at \url{https://github.com/ropensci/fulltext/issues}
 #' 
-#' @importFrom utils URLdecode URLencode browseURL head modifyList download.file
+#' @importFrom utils URLdecode URLencode browseURL head modifyList download.file unzip
 #' @importFrom methods is
 #' @importFrom stats na.omit setNames
 #' @importFrom xml2 read_html read_xml xml_find_one xml_find_all xml_text xml_contents xml_attr
@@ -44,7 +47,6 @@
 #' @name fulltext-package
 #' @aliases fulltext
 #' @docType package
-#' @title Fulltext search and retrieval of scholarly texts.
 #' @author Scott Chamberlain <myrmecocystus@@gmail.com>
 #' @keywords package
 NULL
