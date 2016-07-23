@@ -1,7 +1,7 @@
 biorxiv_search <- function(query, limit = 10, ...) {
   url <- file.path(bior_base(), URLencode(paste0(query, " numresults:30")))
   res <- GET(url)
-  html <- xml2::read_html(content(res, "text"))
+  html <- xml2::read_html(content(res, "text", encoding = 'UTF-8'))
   found <- get_found(html)
   init_ret <- length(xml2::xml_find_all(html, "//*[contains(text(), 'dx.doi.org')]"))
   html_pages <- NULL
@@ -9,7 +9,7 @@ biorxiv_search <- function(query, limit = 10, ...) {
     urls <- make_next_pages(min(c(found, limit)), init_ret, url)
     html_pages <- lapply(urls, function(z) {
       tmp <- GET(z)
-      xml2::read_html(content(tmp, "text"))
+      xml2::read_html(content(tmp, "text", encoding = 'UTF-8'))
     })
   }
   all_html <- unlist(list(list(html), html_pages), recursive = FALSE)
@@ -29,7 +29,7 @@ biorxiv_search <- function(query, limit = 10, ...) {
 bior_base <- function() "http://www.biorxiv.org/search"
 
 find_one_try <- function(html, x) {
-  res <- tryCatch(suppressWarnings(xml2::xml_find_one(html, sprintf("//meta[@name='%s']", x))), error = function(e) e)
+  res <- tryCatch(suppressWarnings(xml2::xml_find_first(html, sprintf("//meta[@name='%s']", x))), error = function(e) e)
   if (is(res, "error")) {
     NA
   } else {
@@ -47,7 +47,7 @@ find_all_try <- function(html, x) {
 }
 
 get_found <- function(x) {
-  tmp <- suppressWarnings(xml2::xml_find_one(x, '//div[@class="highwire-search-summary"]'))
+  tmp <- suppressWarnings(xml2::xml_find_first(x, '//div[@class="highwire-search-summary"]'))
   as.numeric(strextract(xml2::xml_text(tmp), "[0-9]+"))
 }
 

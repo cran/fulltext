@@ -7,7 +7,7 @@ Description: Provides a single interface to many sources of full text
     included for searching for articles, downloading full or partial
     text, downloading supplementary materials, converting to various
     data formats used in and outside of R.
-Version: 0.1.6
+Version: 0.1.8
 License: MIT + file LICENSE
 Authors@R: person("Scott", "Chamberlain", role = c("aut", "cre"),
     email = "myrmecocystus@gmail.com")
@@ -15,14 +15,14 @@ URL: https://github.com/ropensci/fulltext
 BugReports: https://github.com/ropensci/fulltext/issues
 LazyLoad: yes
 VignetteBuilder: knitr
-Imports: methods, utils, stats, httr (>= 1.0.0), magrittr, xml2,
-        jsonlite, rplos (>= 0.5.2), rcrossref, aRxiv, rentrez, tm,
-        rredis, R.cache, digest, whisker
+Imports: methods, utils, stats, httr (>= 1.1.0), magrittr, xml2 (>=
+        1.0.0), jsonlite, rplos (>= 0.6.0), rcrossref (>= 0.5.4),
+        aRxiv, rentrez, tm, rredis, R.cache, digest, whisker
 Suggests: testthat, knitr
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-01-22 01:02:51 UTC; sacmac
+Packaged: 2016-07-23 05:50:26 UTC; sacmac
 Author: Scott Chamberlain [aut, cre]
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
 Repository: CRAN
-Date/Publication: 2016-01-22 10:26:45
+Date/Publication: 2016-07-23 08:32:28

@@ -24,9 +24,7 @@ plugin_crossref <- function(sources, query, limit, opts){
     opts$query <- query
     opts$limit <- limit
     opts$filter <- c(has_license = TRUE)
-    # opts$filter <- c(`license.url`='http://creativecommons.org/licenses/by/3.0/deed.en_US')
-    out <- tryCatch(do.call(cr_works, opts), warning = function(w) w)
-    if (is(out, "simpleWarning")) stop(out$message, call. = FALSE)
+    out <- do.call(cr_works, opts)
     out$data <- names_lower(out$data)
     zz <- list(source = "crossref", found = out$meta$total_results, data = out$data, opts = opts, 
                license = list(type = "variable, see individual records"))
@@ -39,14 +37,14 @@ plugin_crossref <- function(sources, query, limit, opts){
 
 plugin_bmc <- function(sources, query, limit, opts){
   if (any(grepl("bmc", sources))) {
-    opts$terms <- query
+    opts$query <- query
     opts$limit <- limit
     out <- do.call(bmc_search, opts)
-    dat <- do.call(rbind, lapply(out$results$entries, data.frame, stringsAsFactors = FALSE))
+    dat <- out$records
     dat <- names_lower(dat)
-    opts$query <- opts$terms; opts$terms <- NULL
-    zz <- list(source = "bmc", found = NA, data = dat, opts = opts, 
-               license = list(type = "variable, see `isOpenAccess` field in results"))
+    opts$query <- NULL
+    zz <- list(source = "bmc", found = out$result$total, data = dat, opts = opts, 
+               license = list(type = "variable, see `openaccess` field in results"))
     structure(zz, class = "ft_ind", query = query)
   } else {
     zz <- list(source = "bmc", found = NULL, data = NULL, opts = opts)

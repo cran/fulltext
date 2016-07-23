@@ -232,7 +232,7 @@ hr {
 #&gt; Query:
 #&gt;   [ecology] 
 #&gt; Found:
-#&gt;   [PLoS: 31172; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0] 
+#&gt;   [PLoS: 33966; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0] 
 #&gt; Returned:
 #&gt;   [PLoS: 10; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0]
 </code></pre>
@@ -241,19 +241,19 @@ hr {
 
 <pre><code class="r">res1$plos
 #&gt; Query: [ecology] 
-#&gt; Records found, returned: [31172, 10] 
+#&gt; Records found, returned: [33966, 10] 
 #&gt; License: [CC-BY] 
 #&gt;                                                         id
 #&gt; 1                             10.1371/journal.pone.0059813
 #&gt; 2                             10.1371/journal.pone.0001248
 #&gt; 3  10.1371/annotation/69333ae7-757a-4651-831c-f28c5eb02120
 #&gt; 4                             10.1371/journal.pone.0080763
-#&gt; 5                             10.1371/journal.pone.0102437
-#&gt; 6                             10.1371/journal.pone.0017342
-#&gt; 7                             10.1371/journal.pone.0140306
-#&gt; 8                             10.1371/journal.pone.0091497
+#&gt; 5                             10.1371/journal.pone.0155019
+#&gt; 6                             10.1371/journal.pone.0102437
+#&gt; 7                             10.1371/journal.pone.0017342
+#&gt; 8                             10.1371/journal.pone.0140306
 #&gt; 9                             10.1371/journal.pone.0092931
-#&gt; 10 10.1371/annotation/28ac6052-4f87-4b88-a817-0cd5743e83d6
+#&gt; 10                            10.1371/journal.pone.0091497
 </code></pre>
 
 <h2>Get full text</h2>
@@ -262,25 +262,27 @@ hr {
 
 <pre><code class="r">(out &lt;- ft_get(res1))
 #&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 8 
+#&gt; [Docs] 9 
 #&gt; [Source] R session  
 #&gt; [IDs] 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
-#&gt;      10.1371/journal.pone.0080763 10.1371/journal.pone.0102437
-#&gt;      10.1371/journal.pone.0017342 10.1371/journal.pone.0140306
-#&gt;      10.1371/journal.pone.0091497 10.1371/journal.pone.0092931 ...
+#&gt;      10.1371/journal.pone.0080763 10.1371/journal.pone.0155019
+#&gt;      10.1371/journal.pone.0102437 10.1371/journal.pone.0017342
+#&gt;      10.1371/journal.pone.0140306 10.1371/journal.pone.0092931
+#&gt;      10.1371/journal.pone.0091497 ...
 </code></pre>
 
 <p>Dig in to the PLOS data</p>
 
 <pre><code class="r">out$plos
 #&gt; $found
-#&gt; [1] 8
+#&gt; [1] 9
 #&gt; 
 #&gt; $dois
 #&gt; [1] &quot;10.1371/journal.pone.0059813&quot; &quot;10.1371/journal.pone.0001248&quot;
-#&gt; [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0102437&quot;
-#&gt; [5] &quot;10.1371/journal.pone.0017342&quot; &quot;10.1371/journal.pone.0140306&quot;
-#&gt; [7] &quot;10.1371/journal.pone.0091497&quot; &quot;10.1371/journal.pone.0092931&quot;
+#&gt; [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0155019&quot;
+#&gt; [5] &quot;10.1371/journal.pone.0102437&quot; &quot;10.1371/journal.pone.0017342&quot;
+#&gt; [7] &quot;10.1371/journal.pone.0140306&quot; &quot;10.1371/journal.pone.0092931&quot;
+#&gt; [9] &quot;10.1371/journal.pone.0091497&quot;
 #&gt; 
 #&gt; $data
 #&gt; $data$backend
@@ -290,21 +292,23 @@ hr {
 #&gt; [1] &quot;session&quot;
 #&gt; 
 #&gt; $data$data
-#&gt; 8 full-text articles retrieved 
+#&gt; 9 full-text articles retrieved 
 #&gt; Min. Length: 3828 - Max. Length: 98949 
 #&gt; DOIs: 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
-#&gt;   10.1371/journal.pone.0080763 10.1371/journal.pone.0102437
-#&gt;   10.1371/journal.pone.0017342 10.1371/journal.pone.0140306
-#&gt;   10.1371/journal.pone.0091497 10.1371/journal.pone.0092931 ... 
+#&gt;   10.1371/journal.pone.0080763 10.1371/journal.pone.0155019
+#&gt;   10.1371/journal.pone.0102437 10.1371/journal.pone.0017342
+#&gt;   10.1371/journal.pone.0140306 10.1371/journal.pone.0092931
+#&gt;   10.1371/journal.pone.0091497 ... 
 #&gt; 
 #&gt; NOTE: extract xml strings like output[&#39;&lt;doi&gt;&#39;]
 #&gt; 
 #&gt; $opts
 #&gt; $opts$doi
 #&gt; [1] &quot;10.1371/journal.pone.0059813&quot; &quot;10.1371/journal.pone.0001248&quot;
-#&gt; [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0102437&quot;
-#&gt; [5] &quot;10.1371/journal.pone.0017342&quot; &quot;10.1371/journal.pone.0140306&quot;
-#&gt; [7] &quot;10.1371/journal.pone.0091497&quot; &quot;10.1371/journal.pone.0092931&quot;
+#&gt; [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0155019&quot;
+#&gt; [5] &quot;10.1371/journal.pone.0102437&quot; &quot;10.1371/journal.pone.0017342&quot;
+#&gt; [7] &quot;10.1371/journal.pone.0140306&quot; &quot;10.1371/journal.pone.0092931&quot;
+#&gt; [9] &quot;10.1371/journal.pone.0091497&quot;
 </code></pre>
 
 <p>Dig in further to get to one of the articles in XML format</p>
@@ -312,10 +316,10 @@ hr {
 <pre><code class="r">library(&quot;xml2&quot;)
 xml2::read_xml(out$plos$data$data$`10.1371/journal.pone.0059813`)
 #&gt; {xml_document}
-#&gt; &lt;article&gt;
-#&gt; [1] &lt;front&gt;\n&lt;journal-meta&gt;\n&lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt;PLoS O ...
-#&gt; [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n&lt;title&gt;Introduction&lt;/title&gt;\n&lt;p&gt;Ecologists  ...
-#&gt; [3] &lt;back&gt;\n&lt;ack&gt;\n&lt;p&gt;Curtis Flather, Mark Burgman, Leon Blaustein, Yaac ...
+#&gt; &lt;article article-type=&quot;research-article&quot; dtd-version=&quot;3.0&quot; lang=&quot;en&quot; xmlns:mml=&quot;http://www.w3.org/1998/Math/MathML&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
+#&gt; [1] &lt;front&gt;\n  &lt;journal-meta&gt;\n    &lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt; ...
+#&gt; [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n    &lt;title&gt;Introduction&lt;/title&gt;\n    &lt;p&gt;Eco ...
+#&gt; [3] &lt;back&gt;\n  &lt;ack&gt;\n    &lt;p&gt;Curtis Flather, Mark Burgman, Leon Blaustein ...
 </code></pre>
 
 <h2>Extract text from pdfs</h2>
@@ -326,7 +330,7 @@ xml2::read_xml(out$plos$data$data$`10.1371/journal.pone.0059813`)
 
 <pre><code class="r">path &lt;- system.file(&quot;examples&quot;, &quot;example1.pdf&quot;, package = &quot;fulltext&quot;)
 ft_extract(path)
-#&gt; &lt;document&gt;/Library/Frameworks/R.framework/Versions/3.2/Resources/library/fulltext/examples/example1.pdf
+#&gt; &lt;document&gt;/Users/sacmac/github/ropensci/fulltext/inst/examples/example1.pdf
 #&gt;   Pages: 18
 #&gt;   Title: Suffering and mental health among older people living in nursing homes---a mixed-methods study
 #&gt;   Producer: pdfTeX-1.40.10
@@ -380,12 +384,13 @@ res2$arxiv$data
 <pre><code class="r">res &lt;- ft_search(query = &quot;ecology&quot;, from = &quot;plos&quot;)
 (x &lt;- ft_get(res))
 #&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 8 
+#&gt; [Docs] 9 
 #&gt; [Source] R session  
 #&gt; [IDs] 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
-#&gt;      10.1371/journal.pone.0080763 10.1371/journal.pone.0102437
-#&gt;      10.1371/journal.pone.0017342 10.1371/journal.pone.0140306
-#&gt;      10.1371/journal.pone.0091497 10.1371/journal.pone.0092931 ...
+#&gt;      10.1371/journal.pone.0080763 10.1371/journal.pone.0155019
+#&gt;      10.1371/journal.pone.0102437 10.1371/journal.pone.0017342
+#&gt;      10.1371/journal.pone.0140306 10.1371/journal.pone.0092931
+#&gt;      10.1371/journal.pone.0091497 ...
 </code></pre>
 
 <p>Extract DOIs</p>
@@ -407,6 +412,11 @@ res2$arxiv$data
 #&gt; [1] &quot;10.1371/journal.pone.0080763&quot;
 #&gt; 
 #&gt; 
+#&gt; $plos$`10.1371/journal.pone.0155019`
+#&gt; $plos$`10.1371/journal.pone.0155019`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0155019&quot;
+#&gt; 
+#&gt; 
 #&gt; $plos$`10.1371/journal.pone.0102437`
 #&gt; $plos$`10.1371/journal.pone.0102437`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0102437&quot;
@@ -422,14 +432,14 @@ res2$arxiv$data
 #&gt; [1] &quot;10.1371/journal.pone.0140306&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0091497`
-#&gt; $plos$`10.1371/journal.pone.0091497`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0091497&quot;
-#&gt; 
-#&gt; 
 #&gt; $plos$`10.1371/journal.pone.0092931`
 #&gt; $plos$`10.1371/journal.pone.0092931`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0092931&quot;
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0091497`
+#&gt; $plos$`10.1371/journal.pone.0091497`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0091497&quot;
 </code></pre>
 
 <p>Extract DOIs and categories</p>
@@ -472,6 +482,56 @@ res2$arxiv$data
 #&gt;  [7] &quot;Evolutionary ecology&quot; &quot;Population ecology&quot;   &quot;Evolutionary biology&quot;
 #&gt; [10] &quot;Behavioral ecology&quot;   &quot;Evolutionary ecology&quot; &quot;Population biology&quot;  
 #&gt; [13] &quot;Population ecology&quot;  
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0155019`
+#&gt; $plos$`10.1371/journal.pone.0155019`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0155019&quot;
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0155019`$categories
+#&gt;  [1] &quot;Research Article&quot;                  
+#&gt;  [2] &quot;Biology and life sciences&quot;         
+#&gt;  [3] &quot;Behavior&quot;                          
+#&gt;  [4] &quot;Recreation&quot;                        
+#&gt;  [5] &quot;Biology and life sciences&quot;         
+#&gt;  [6] &quot;Ecology&quot;                           
+#&gt;  [7] &quot;Ecosystems&quot;                        
+#&gt;  [8] &quot;Ecology and environmental sciences&quot;
+#&gt;  [9] &quot;Ecology&quot;                           
+#&gt; [10] &quot;Ecosystems&quot;                        
+#&gt; [11] &quot;Ecology and environmental sciences&quot;
+#&gt; [12] &quot;Conservation science&quot;              
+#&gt; [13] &quot;Earth sciences&quot;                    
+#&gt; [14] &quot;Geography&quot;                         
+#&gt; [15] &quot;Human geography&quot;                   
+#&gt; [16] &quot;Land use&quot;                          
+#&gt; [17] &quot;Social sciences&quot;                   
+#&gt; [18] &quot;Human geography&quot;                   
+#&gt; [19] &quot;Land use&quot;                          
+#&gt; [20] &quot;Biology and life sciences&quot;         
+#&gt; [21] &quot;Ecology&quot;                           
+#&gt; [22] &quot;Ecosystems&quot;                        
+#&gt; [23] &quot;Ecosystem functioning&quot;             
+#&gt; [24] &quot;Ecology and environmental sciences&quot;
+#&gt; [25] &quot;Ecology&quot;                           
+#&gt; [26] &quot;Ecosystems&quot;                        
+#&gt; [27] &quot;Ecosystem functioning&quot;             
+#&gt; [28] &quot;Biology and life sciences&quot;         
+#&gt; [29] &quot;Ecology&quot;                           
+#&gt; [30] &quot;Ecological metrics&quot;                
+#&gt; [31] &quot;Productivity (ecology)&quot;            
+#&gt; [32] &quot;Ecology and environmental sciences&quot;
+#&gt; [33] &quot;Ecology&quot;                           
+#&gt; [34] &quot;Ecological metrics&quot;                
+#&gt; [35] &quot;Productivity (ecology)&quot;            
+#&gt; [36] &quot;Biology and life sciences&quot;         
+#&gt; [37] &quot;Ecology&quot;                           
+#&gt; [38] &quot;Theoretical ecology&quot;               
+#&gt; [39] &quot;Ecology and environmental sciences&quot;
+#&gt; [40] &quot;Ecology&quot;                           
+#&gt; [41] &quot;Theoretical ecology&quot;               
+#&gt; [42] &quot;Social sciences&quot;                   
+#&gt; [43] &quot;Economics&quot;                         
 #&gt; 
 #&gt; 
 #&gt; $plos$`10.1371/journal.pone.0102437`
@@ -525,19 +585,19 @@ res2$arxiv$data
 #&gt; [1] &quot;Correction&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0091497`
-#&gt; $plos$`10.1371/journal.pone.0091497`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0091497&quot;
-#&gt; 
-#&gt; $plos$`10.1371/journal.pone.0091497`$categories
-#&gt; [1] &quot;Correction&quot;
-#&gt; 
-#&gt; 
 #&gt; $plos$`10.1371/journal.pone.0092931`
 #&gt; $plos$`10.1371/journal.pone.0092931`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0092931&quot;
 #&gt; 
 #&gt; $plos$`10.1371/journal.pone.0092931`$categories
+#&gt; [1] &quot;Correction&quot;
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0091497`
+#&gt; $plos$`10.1371/journal.pone.0091497`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0091497&quot;
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0091497`$categories
 #&gt; [1] &quot;Correction&quot;
 </code></pre>
 
@@ -549,11 +609,12 @@ res2$arxiv$data
 #&gt; 1 10.1371/journal.pone.0059813       2012-09-16       2013-02-19
 #&gt; 2 10.1371/journal.pone.0001248       2007-07-02       2007-11-06
 #&gt; 3 10.1371/journal.pone.0080763       2013-08-15       2013-10-16
-#&gt; 4 10.1371/journal.pone.0102437       2013-11-27       2014-06-19
-#&gt; 5 10.1371/journal.pone.0017342       2010-08-24       2011-01-31
-#&gt; 6 10.1371/journal.pone.0140306             &lt;NA&gt;             &lt;NA&gt;
-#&gt; 7 10.1371/journal.pone.0091497             &lt;NA&gt;             &lt;NA&gt;
+#&gt; 4 10.1371/journal.pone.0155019       2015-09-22       2016-04-22
+#&gt; 5 10.1371/journal.pone.0102437       2013-11-27       2014-06-19
+#&gt; 6 10.1371/journal.pone.0017342       2010-08-24       2011-01-31
+#&gt; 7 10.1371/journal.pone.0140306             &lt;NA&gt;             &lt;NA&gt;
 #&gt; 8 10.1371/journal.pone.0092931             &lt;NA&gt;             &lt;NA&gt;
+#&gt; 9 10.1371/journal.pone.0091497             &lt;NA&gt;             &lt;NA&gt;
 </code></pre>
 
 </body>

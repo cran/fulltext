@@ -10,18 +10,18 @@
 ft_get_si(x, si, from = c("auto", "plos", "wiley", "science", "proceedings",
   "figshare", "esa_data_archives", "esa_archives", "biorxiv", "epmc"),
   save.name = NA, dir = NA, cache = TRUE, vol = NA, issue = NA,
-  list = FALSE, timeout = 10)
+  list = FALSE, timeout = 10, ...)
 
 \method{ft_get_si}{character}(x, si, from = c("auto", "plos", "wiley",
   "science", "proceedings", "figshare", "esa_data_archives", "esa_archives",
   "biorxiv", "epmc"), save.name = NA, dir = NA, cache = TRUE, vol = NA,
-  issue = NA, list = FALSE, timeout = 10)
+  issue = NA, list = FALSE, timeout = 10, ...)
 
 \method{ft_get_si}{ft_data}(x, si, from = NA, save.name = NA, dir = NA,
-  cache = TRUE, vol = NA, issue = NA, list = FALSE, timeout = 10)
+  cache = TRUE, vol = NA, issue = NA, list = FALSE, timeout = 10, ...)
 
 \method{ft_get_si}{ft}(x, si, from = NA, save.name = NA, dir = NA,
-  cache = TRUE, vol = NA, issue = NA, list = FALSE, timeout = 10)
+  cache = TRUE, vol = NA, issue = NA, list = FALSE, timeout = 10, ...)
 }
 \arguments{
 \item{x}{One of: vector of DOI(s) of article(s) (a
@@ -69,10 +69,12 @@ using EPMC (see notes)}
 
 \item{timeout}{how long to wait for successful download (default 10
 seconds)}
+
+\item{...}{Further args passed on to \code{\link[httr]{GET}}}
 }
 \description{
-Put a call to this function where you would put a file-path - everything 
-is cached by default, so you don't have to worry about multiple downloads 
+Put a call to this function where you would put a file-path - everything
+is cached by default, so you don't have to worry about multiple downloads
 in the same session.
 }
 \details{
@@ -82,7 +84,8 @@ you want to download data from, and the number of the supplement
 you want to download (1, 5, etc.). ESA journals don't use DOIs
 (give the article code; see below), and Proceedings, Science, and
 ESA journals need you to give the filename of the supplement to
-download. The file extensions (suffixes) of files are returned as
+download. For FigShare articles, you can give either the number or
+the name. The file extensions (suffixes) of files are returned as
 \code{suffix} attributes (see first example), which may be useful
 if you don't know the format of the file you're downloading.
 
@@ -157,6 +160,9 @@ mammals <- read.csv(ft_get_si("E092-201", "MCDB_communities.csv",
                                             "esa_data_archives"))
 epmc.fig <- ft_get_si("10.1371/journal.pone.0126524", "pone.0126524.g005.jpg", "epmc")
 #...note this 'SI' is not actually an SI, but rather an image from the paper.
+
+# curl options
+ft_get_si("E093-059", "myco_db.csv", "esa_archives")
 }
 }
 \author{
