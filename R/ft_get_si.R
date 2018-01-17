@@ -3,13 +3,15 @@
 #' Put a call to this function where you would put a file-path - everything
 #' is cached by default, so you don't have to worry about multiple downloads
 #' in the same session.
-#'
+#' 
+#' @export
+#' @template ft_get_si
 #' @param x One of: vector of DOI(s) of article(s) (a
 #' \code{character}), output from \code{\link{ft_get}}, or output from
 #' \code{\link{ft_search}}. Note: if using ESA journal, you can *only*
 #' use the ESA-specific article code (e.g., E092-201).
 #' @param si number of the supplement to be downloaded (1, 2, 3, etc.),
-#' or (for ESA and Science journals) the name of the supplment (e.g.,
+#' or (for ESA and Science journals) the name of the supplement (e.g.,
 #' "S1_data.csv"). Can be a \code{character} or \code{numeric}.
 #' @param from Publisher of article (\code{character}). The default
 #' (\code{auto}) uses crossref (\code{\link[rcrossref]{cr_works}}) to
@@ -45,8 +47,7 @@
 #' @note Make sure that the article from which you're attempting to
 #' download supplementary materials *has* supplementary materials. 404
 #' errors and 'file not found' errors can result from such cases.
-#' @examples
-#' \dontrun{
+#' @examples \dontrun{
 #' #Put the function wherever you would put a file path
 #' crabs <- read.csv(ft_get_si("10.6084/m9.figshare.979288", 2))
 #'
@@ -66,8 +67,6 @@
 #' # curl options
 #' ft_get_si("E093-059", "myco_db.csv", "esa_archives")
 #' }
-#' @template ft_get_si
-#' @export
 ft_get_si <- function(x, si, from=c("auto","plos","wiley","science","proceedings",
                                     "figshare","esa_data_archives","esa_archives",
                                     "biorxiv","epmc"),
@@ -78,7 +77,6 @@ ft_get_si <- function(x, si, from=c("auto","plos","wiley","science","proceedings
 }
 
 #' @export
-#' @rdname ft_get_si
 ft_get_si.character <- function(x, si, from=c("auto","plos","wiley","science","proceedings",
                                               "figshare","esa_data_archives","esa_archives",
                                               "biorxiv","epmc"),
@@ -105,7 +103,7 @@ ft_get_si.character <- function(x, si, from=c("auto","plos","wiley","science","p
     ############################
     #Recurse if needed (can't use Recall because of potential argument length problems)
     if(length(x) > 1)
-        return(setNames(unlist(mapply(ft_get_si.character, x=x,si=si,from=from,
+        return(stats::setNames(unlist(mapply(ft_get_si.character, x=x,si=si,from=from,
                                       save.name=save.name,dir=dir,cache=cache,
                                       vol=vol,issue=issue,list=list,timeout=timeout)),x))
     ############################
@@ -134,7 +132,6 @@ ft_get_si.character <- function(x, si, from=c("auto","plos","wiley","science","p
 }
 
 #' @export
-#' @rdname ft_get_si
 ft_get_si.ft_data <- function(x, si, from=NA, save.name=NA, dir=NA, cache=TRUE,
                               vol=NA, issue=NA, list=FALSE, timeout=10, ...){
     if(!is.na(from))
@@ -142,18 +139,17 @@ ft_get_si.ft_data <- function(x, si, from=NA, save.name=NA, dir=NA, cache=TRUE,
     from <- names(x)
     x <- unlist(sapply(x, function(x) x$dois))
     from <- .fix.param(x, from, "from")
-    return(setNames(unlist(mapply(ft_get_si.character, x=x,si=si,from=from,save.name=save.name,
+    return(stats::setNames(unlist(mapply(ft_get_si.character, x=x,si=si,from=from,save.name=save.name,
                                   dir=dir,cache=cache,vol=vol,issue=issue,list=list,timeout=timeout, ...)), x))
 }
 
 #' @export
-#' @rdname ft_get_si
 ft_get_si.ft <- function(x, si, from=NA, save.name=NA, dir=NA, cache=TRUE, vol=NA,
                          issue=NA, list=FALSE, timeout=10, ...){
     if(!is.na(from))
         stop("Cannot use 'from' argument with 'ft' input")
     x <- unlist(sapply(x, function(x) x$data$id))
     from <- names(x)
-    return(setNames(unlist(mapply(ft_get_si.character, x=x,si=si,from=from,save.name=save.name,
+    return(stats::setNames(unlist(mapply(ft_get_si.character, x=x,si=si,from=from,save.name=save.name,
                                   dir=dir,cache=cache,vol=vol,issue=issue,list=list,timeout=timeout, ...)),x))
 }

@@ -232,28 +232,28 @@ hr {
 #&gt; Query:
 #&gt;   [ecology] 
 #&gt; Found:
-#&gt;   [PLoS: 33966; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0] 
+#&gt;   [PLoS: 41464; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
 #&gt; Returned:
-#&gt;   [PLoS: 10; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0]
+#&gt;   [PLoS: 10; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]
 </code></pre>
 
 <p>Each publisher/search-engine has a slot with metadata and data</p>
 
 <pre><code class="r">res1$plos
 #&gt; Query: [ecology] 
-#&gt; Records found, returned: [33966, 10] 
+#&gt; Records found, returned: [41464, 10] 
 #&gt; License: [CC-BY] 
-#&gt;                                                         id
-#&gt; 1                             10.1371/journal.pone.0059813
-#&gt; 2                             10.1371/journal.pone.0001248
-#&gt; 3  10.1371/annotation/69333ae7-757a-4651-831c-f28c5eb02120
-#&gt; 4                             10.1371/journal.pone.0080763
-#&gt; 5                             10.1371/journal.pone.0155019
-#&gt; 6                             10.1371/journal.pone.0102437
-#&gt; 7                             10.1371/journal.pone.0017342
-#&gt; 8                             10.1371/journal.pone.0140306
-#&gt; 9                             10.1371/journal.pone.0092931
-#&gt; 10                            10.1371/journal.pone.0091497
+#&gt;                              id
+#&gt; 1  10.1371/journal.pone.0001248
+#&gt; 2  10.1371/journal.pone.0059813
+#&gt; 3  10.1371/journal.pone.0155019
+#&gt; 4  10.1371/journal.pone.0080763
+#&gt; 5  10.1371/journal.pone.0150648
+#&gt; 6  10.1371/journal.pcbi.1003594
+#&gt; 7  10.1371/journal.pone.0102437
+#&gt; 8  10.1371/journal.pone.0175014
+#&gt; 9  10.1371/journal.pone.0166559
+#&gt; 10 10.1371/journal.pone.0054689
 </code></pre>
 
 <h2>Get full text</h2>
@@ -262,154 +262,90 @@ hr {
 
 <pre><code class="r">(out &lt;- ft_get(res1))
 #&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 9 
-#&gt; [Source] R session  
-#&gt; [IDs] 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
-#&gt;      10.1371/journal.pone.0080763 10.1371/journal.pone.0155019
-#&gt;      10.1371/journal.pone.0102437 10.1371/journal.pone.0017342
-#&gt;      10.1371/journal.pone.0140306 10.1371/journal.pone.0092931
-#&gt;      10.1371/journal.pone.0091497 ...
+#&gt; [Docs] 10 
+#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
+#&gt; [IDs] 10.1371/journal.pone.0001248 10.1371/journal.pone.0059813
+#&gt;      10.1371/journal.pone.0155019 10.1371/journal.pone.0080763
+#&gt;      10.1371/journal.pone.0150648 10.1371/journal.pcbi.1003594
+#&gt;      10.1371/journal.pone.0102437 10.1371/journal.pone.0175014
+#&gt;      10.1371/journal.pone.0166559 10.1371/journal.pone.0054689 ...
 </code></pre>
 
 <p>Dig in to the PLOS data</p>
 
-<pre><code class="r">out$plos
-#&gt; $found
-#&gt; [1] 9
+<pre><code class="r">out$plos$data$path[[1]]
+#&gt; $path
+#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext/10_1371_journal_pone_0001248.xml&quot;
 #&gt; 
-#&gt; $dois
-#&gt; [1] &quot;10.1371/journal.pone.0059813&quot; &quot;10.1371/journal.pone.0001248&quot;
-#&gt; [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0155019&quot;
-#&gt; [5] &quot;10.1371/journal.pone.0102437&quot; &quot;10.1371/journal.pone.0017342&quot;
-#&gt; [7] &quot;10.1371/journal.pone.0140306&quot; &quot;10.1371/journal.pone.0092931&quot;
-#&gt; [9] &quot;10.1371/journal.pone.0091497&quot;
+#&gt; $id
+#&gt; [1] &quot;10.1371/journal.pone.0001248&quot;
 #&gt; 
-#&gt; $data
-#&gt; $data$backend
+#&gt; $type
+#&gt; [1] &quot;xml&quot;
+#&gt; 
+#&gt; $error
 #&gt; NULL
-#&gt; 
-#&gt; $data$path
-#&gt; [1] &quot;session&quot;
-#&gt; 
-#&gt; $data$data
-#&gt; 9 full-text articles retrieved 
-#&gt; Min. Length: 3828 - Max. Length: 98949 
-#&gt; DOIs: 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
-#&gt;   10.1371/journal.pone.0080763 10.1371/journal.pone.0155019
-#&gt;   10.1371/journal.pone.0102437 10.1371/journal.pone.0017342
-#&gt;   10.1371/journal.pone.0140306 10.1371/journal.pone.0092931
-#&gt;   10.1371/journal.pone.0091497 ... 
-#&gt; 
-#&gt; NOTE: extract xml strings like output[&#39;&lt;doi&gt;&#39;]
-#&gt; 
-#&gt; $opts
-#&gt; $opts$doi
-#&gt; [1] &quot;10.1371/journal.pone.0059813&quot; &quot;10.1371/journal.pone.0001248&quot;
-#&gt; [3] &quot;10.1371/journal.pone.0080763&quot; &quot;10.1371/journal.pone.0155019&quot;
-#&gt; [5] &quot;10.1371/journal.pone.0102437&quot; &quot;10.1371/journal.pone.0017342&quot;
-#&gt; [7] &quot;10.1371/journal.pone.0140306&quot; &quot;10.1371/journal.pone.0092931&quot;
-#&gt; [9] &quot;10.1371/journal.pone.0091497&quot;
-</code></pre>
-
-<p>Dig in further to get to one of the articles in XML format</p>
-
-<pre><code class="r">library(&quot;xml2&quot;)
-xml2::read_xml(out$plos$data$data$`10.1371/journal.pone.0059813`)
-#&gt; {xml_document}
-#&gt; &lt;article article-type=&quot;research-article&quot; dtd-version=&quot;3.0&quot; lang=&quot;en&quot; xmlns:mml=&quot;http://www.w3.org/1998/Math/MathML&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
-#&gt; [1] &lt;front&gt;\n  &lt;journal-meta&gt;\n    &lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt; ...
-#&gt; [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n    &lt;title&gt;Introduction&lt;/title&gt;\n    &lt;p&gt;Eco ...
-#&gt; [3] &lt;back&gt;\n  &lt;ack&gt;\n    &lt;p&gt;Curtis Flather, Mark Burgman, Leon Blaustein ...
 </code></pre>
 
 <h2>Extract text from pdfs</h2>
 
-<p>Ideally for text mining you have access to XML or other text based formats. However, sometimes you only have access to PDFs. In this case you want to extract text from PDFs. <code>fulltext</code> can help with that. </p>
+<p>Ideally for text mining you have access to XML or other text based formats. However, 
+sometimes you only have access to PDFs. In this case you want to extract text 
+from PDFs. <code>fulltext</code> can help with that. </p>
 
 <p>You can extract from any pdf from a file path, like:</p>
 
 <pre><code class="r">path &lt;- system.file(&quot;examples&quot;, &quot;example1.pdf&quot;, package = &quot;fulltext&quot;)
 ft_extract(path)
-#&gt; &lt;document&gt;/Users/sacmac/github/ropensci/fulltext/inst/examples/example1.pdf
-#&gt;   Pages: 18
+#&gt; &lt;document&gt;/Library/Frameworks/R.framework/Versions/3.4/Resources/library/fulltext/examples/example1.pdf
 #&gt;   Title: Suffering and mental health among older people living in nursing homes---a mixed-methods study
 #&gt;   Producer: pdfTeX-1.40.10
 #&gt;   Creation date: 2015-07-17
 </code></pre>
 
-<p>Let&#39;s search for articles from arXiv, a preprint service. Here, get pdf from an article with ID <code>cond-mat/9309029</code>:</p>
+<p>Let&#39;s search for articles from arXiv, a preprint service. Here, get pdf from 
+an article with ID <code>cond-mat/9309029</code>:</p>
 
 <pre><code class="r">res &lt;- ft_get(&#39;cond-mat/9309029&#39;, from = &quot;arxiv&quot;)
 res2 &lt;- ft_extract(res)
-res2$arxiv$data
-#&gt; $backend
-#&gt; NULL
-#&gt; 
-#&gt; $path
-#&gt; $path$`cond-mat/9309029`
-#&gt; [1] &quot;~/.fulltext/cond-mat_9309029.pdf&quot;
-#&gt; 
-#&gt; attr(,&quot;format&quot;)
-#&gt; [1] &quot;xml&quot;
-#&gt; 
-#&gt; $data
-#&gt; $data[[1]]
-#&gt; &lt;document&gt;/Users/sacmac/.fulltext/cond-mat_9309029.pdf
-#&gt;   Pages: 14
-#&gt;   Title: arXiv:cond-mat/9309029v8  26 Jan 1994
-#&gt;   Producer: GPL Ghostscript SVN PRE-RELEASE 8.62
-#&gt;   Creation date: 2008-02-06
-</code></pre>
-
-<p>And a short snippet of the full text</p>
-
-<pre><code class="r">res2$arxiv$data$data[[1]]$data
-#&gt; &quot;arXiv:cond-mat/9309029v8 26 Jan 1994, , FERMILAB-PUB-93/15-T March 1993, Revised:
-#&gt; January 1994, The Thermodynamics and Economics of Waste, Dallas C. Kennedy, Research
-#&gt; Associate, Fermi National Accelerator Laboratory, P.O. Box 500 MS106, Batavia, Illinois
-#&gt; 60510 USA, Abstract, The increasingly relevant problem of natural resource use and
-#&gt; waste production, disposal, and reuse is examined from several viewpoints: economic,
-#&gt; technical, and thermodynamic. Alternative economies are studied, with emphasis on
-#&gt; recycling of waste to close the natural resource cycle. The physical nature of human
-#&gt; economies and constraints on recycling and energy efficiency are stated in terms 
-#&gt; ...&quot;
+# the first page
+res2$arxiv$data$data$`cond-mat/9309029`[1]
+#&gt; [1] &quot;                                                                                                                          FERMILAB-PUB-93/15-T\n                                                                                                                                       March 1993\n                                                                                                                             Revised: January 1994\n                                           The Thermodynamics and Economics of Waste\n                                           Dallas C. Kennedy, Research Associate,\narXiv:cond-mat/9309029v8 26 Jan 1994\n                                           Fermi National Accelerator Laboratory,\n                                           P.O. Box 500 MS106, Batavia, Illinois 60510 USA∗\n                                                                                         Abstract\n                                       The increasingly relevant problem of natural resource use and waste production, disposal, and reuse is\n                                       examined from several viewpoints: economic, technical, and thermodynamic. Alternative economies are\n                                       studied, with emphasis on recycling of waste to close the natural resource cycle. The physical nature of\n                                       human economies and constraints on recycling and energy efficiency are stated in terms of entropy and\n                                       complexity.\n                                           What is a cynic? A man who knows the price of everything, and the value of nothing.\n                                                                                                                                      Oscar Wilde [1]\n                                            Our planet is finite in size and, except for a few energy and matter flows, its biosphere forms a closed\n                                       system. The envelope that makes life possible extends a small distance below the surface of the Earth and\n                                       less than a hundred miles into the atmosphere. While almost closed, the biosphere is not static, but is\n                                       constantly changing, moving flows of energy, air, water, soil, and life around in a shifting, never-repeating\n                                       pattern. The combination of general physical laws and the specific properties of the Earth places important\n                                       constraints on the activities of life, some embodied in the metabolism and forms of living creatures, others\n                                       imprinted into their genes by selective effects. All life needs sources of energy for sustenance and imposes\n                                       a burden of waste on its environment. Since this waste is usually harmful to the creatures emitting it, the\n                                       environment must, if these creatures are to continue living, break the waste down into less toxic forms and\n                                       possibly reuse it.\n                                            The growing dominance of humankind over the planet, both by technological power and by numbers,\n                                       imposes certain costs on the biosphere, sometimes a result of conscious attempts at controlling Nature, but\n                                       more frequently by unwitting influence. Moreover, the burden of carrying the activities of human sustenance,\n                                       unlike that of other animals, cannot be understood by considering the physical and biological activities of each\n                                       person in isolation. Because of their unique position at the top of the food chain, their tool-making abilities,\n                                       and the co-operative character of human activities (the division of labor or specialization), the physical and\n                                       biological aspects must be considered together in the context of the peculiarities of economic life [2]. The\n                                       economic aspects take on an independent importance because of the absence of any automatic, given means\n                                       of human subsistence and the extension of individual self-sufficiency by surplus production and trading [3].\n                                       This point of view is necessary for comprehending the ecological significance of all economies more elaborate\n                                       than the simplest subsistence or household economies, up to and including the most sophisticated systems\n                                       of technology and trade. On the other hand, the formulation of economic theory has generally taken place,\n                                         * Present address: Department of Physics, University of Florida, Gainesville, Florida 32611 USA\n                                                                                              1\n&quot;
 </code></pre>
 
 <h2>Extract text chunks</h2>
 
-<p>We have a few functions to help you pull out certain parts of an article. For example, perhaps you want to get just the authors from your articles, or just the abstracts. </p>
+<p>We have a few functions to help you pull out certain parts of an article. 
+For example, perhaps you want to get just the authors from your articles, 
+or just the abstracts. </p>
 
-<p>Here, we&#39;ll search for some PLOS articles, then get their full text, then extract various parts of each article with <code>chunks()</code>.</p>
+<p>Here, we&#39;ll search for some PLOS articles, then get their full text, then
+extract various parts of each article with <code>ft_chunks()</code>.</p>
 
 <pre><code class="r">res &lt;- ft_search(query = &quot;ecology&quot;, from = &quot;plos&quot;)
 (x &lt;- ft_get(res))
 #&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 9 
-#&gt; [Source] R session  
-#&gt; [IDs] 10.1371/journal.pone.0059813 10.1371/journal.pone.0001248
-#&gt;      10.1371/journal.pone.0080763 10.1371/journal.pone.0155019
-#&gt;      10.1371/journal.pone.0102437 10.1371/journal.pone.0017342
-#&gt;      10.1371/journal.pone.0140306 10.1371/journal.pone.0092931
-#&gt;      10.1371/journal.pone.0091497 ...
+#&gt; [Docs] 10 
+#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
+#&gt; [IDs] 10.1371/journal.pone.0001248 10.1371/journal.pone.0059813
+#&gt;      10.1371/journal.pone.0155019 10.1371/journal.pone.0080763
+#&gt;      10.1371/journal.pone.0150648 10.1371/journal.pcbi.1003594
+#&gt;      10.1371/journal.pone.0102437 10.1371/journal.pone.0175014
+#&gt;      10.1371/journal.pone.0166559 10.1371/journal.pone.0054689 ...
 </code></pre>
 
 <p>Extract DOIs</p>
 
-<pre><code class="r">x %&gt;% chunks(&quot;doi&quot;)
+<pre><code class="r">x %&gt;% ft_collect() %&gt;% ft_chunks(&quot;doi&quot;)
 #&gt; $plos
-#&gt; $plos$`10.1371/journal.pone.0059813`
-#&gt; $plos$`10.1371/journal.pone.0059813`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0059813&quot;
-#&gt; 
-#&gt; 
 #&gt; $plos$`10.1371/journal.pone.0001248`
 #&gt; $plos$`10.1371/journal.pone.0001248`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0001248&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0080763`
-#&gt; $plos$`10.1371/journal.pone.0080763`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0080763&quot;
+#&gt; $plos$`10.1371/journal.pone.0059813`
+#&gt; $plos$`10.1371/journal.pone.0059813`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0059813&quot;
 #&gt; 
 #&gt; 
 #&gt; $plos$`10.1371/journal.pone.0155019`
@@ -417,204 +353,141 @@ res2$arxiv$data
 #&gt; [1] &quot;10.1371/journal.pone.0155019&quot;
 #&gt; 
 #&gt; 
+#&gt; $plos$`10.1371/journal.pone.0080763`
+#&gt; $plos$`10.1371/journal.pone.0080763`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0080763&quot;
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0150648`
+#&gt; $plos$`10.1371/journal.pone.0150648`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0150648&quot;
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pcbi.1003594`
+#&gt; $plos$`10.1371/journal.pcbi.1003594`$doi
+#&gt; [1] &quot;10.1371/journal.pcbi.1003594&quot;
+#&gt; 
+#&gt; 
 #&gt; $plos$`10.1371/journal.pone.0102437`
 #&gt; $plos$`10.1371/journal.pone.0102437`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0102437&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0017342`
-#&gt; $plos$`10.1371/journal.pone.0017342`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0017342&quot;
+#&gt; $plos$`10.1371/journal.pone.0175014`
+#&gt; $plos$`10.1371/journal.pone.0175014`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0175014&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0140306`
-#&gt; $plos$`10.1371/journal.pone.0140306`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0140306&quot;
+#&gt; $plos$`10.1371/journal.pone.0166559`
+#&gt; $plos$`10.1371/journal.pone.0166559`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0166559&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0092931`
-#&gt; $plos$`10.1371/journal.pone.0092931`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0092931&quot;
-#&gt; 
-#&gt; 
-#&gt; $plos$`10.1371/journal.pone.0091497`
-#&gt; $plos$`10.1371/journal.pone.0091497`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0091497&quot;
+#&gt; $plos$`10.1371/journal.pone.0054689`
+#&gt; $plos$`10.1371/journal.pone.0054689`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0054689&quot;
 </code></pre>
 
 <p>Extract DOIs and categories</p>
 
-<pre><code class="r">x %&gt;% chunks(c(&quot;doi&quot;,&quot;categories&quot;))
+<pre><code class="r">x %&gt;% ft_collect() %&gt;% ft_chunks(c(&quot;doi&quot;, &quot;title&quot;))
 #&gt; $plos
-#&gt; $plos$`10.1371/journal.pone.0059813`
-#&gt; $plos$`10.1371/journal.pone.0059813`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0059813&quot;
-#&gt; 
-#&gt; $plos$`10.1371/journal.pone.0059813`$categories
-#&gt;  [1] &quot;Research Article&quot;                 &quot;Biology&quot;                         
-#&gt;  [3] &quot;Ecology&quot;                          &quot;Community ecology&quot;               
-#&gt;  [5] &quot;Species interactions&quot;             &quot;Science policy&quot;                  
-#&gt;  [7] &quot;Research assessment&quot;              &quot;Research monitoring&quot;             
-#&gt;  [9] &quot;Research funding&quot;                 &quot;Government funding of science&quot;   
-#&gt; [11] &quot;Research laboratories&quot;            &quot;Science policy and economics&quot;    
-#&gt; [13] &quot;Science and technology workforce&quot; &quot;Careers in research&quot;             
-#&gt; [15] &quot;Social and behavioral sciences&quot;   &quot;Sociology&quot;                       
-#&gt; [17] &quot;Sociology of knowledge&quot;          
-#&gt; 
-#&gt; 
 #&gt; $plos$`10.1371/journal.pone.0001248`
 #&gt; $plos$`10.1371/journal.pone.0001248`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0001248&quot;
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0001248`$categories
-#&gt; [1] &quot;Research Article&quot;             &quot;Ecology&quot;                     
-#&gt; [3] &quot;Ecology/Ecosystem Ecology&quot;    &quot;Ecology/Evolutionary Ecology&quot;
-#&gt; [5] &quot;Ecology/Theoretical Ecology&quot; 
+#&gt; $plos$`10.1371/journal.pone.0001248`$title
+#&gt; [1] &quot;A Tale of Four Stories: Soil Ecology, Theory, Evolution and the Publication System&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0080763`
-#&gt; $plos$`10.1371/journal.pone.0080763`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0080763&quot;
+#&gt; $plos$`10.1371/journal.pone.0059813`
+#&gt; $plos$`10.1371/journal.pone.0059813`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0059813&quot;
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0080763`$categories
-#&gt;  [1] &quot;Research Article&quot;     &quot;Biology&quot;              &quot;Ecology&quot;             
-#&gt;  [4] &quot;Autecology&quot;           &quot;Behavioral ecology&quot;   &quot;Community ecology&quot;   
-#&gt;  [7] &quot;Evolutionary ecology&quot; &quot;Population ecology&quot;   &quot;Evolutionary biology&quot;
-#&gt; [10] &quot;Behavioral ecology&quot;   &quot;Evolutionary ecology&quot; &quot;Population biology&quot;  
-#&gt; [13] &quot;Population ecology&quot;  
+#&gt; $plos$`10.1371/journal.pone.0059813`$title
+#&gt; [1] &quot;Trends in Ecological Research during the Last Three Decades – A Systematic Review&quot;
 #&gt; 
 #&gt; 
 #&gt; $plos$`10.1371/journal.pone.0155019`
 #&gt; $plos$`10.1371/journal.pone.0155019`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0155019&quot;
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0155019`$categories
-#&gt;  [1] &quot;Research Article&quot;                  
-#&gt;  [2] &quot;Biology and life sciences&quot;         
-#&gt;  [3] &quot;Behavior&quot;                          
-#&gt;  [4] &quot;Recreation&quot;                        
-#&gt;  [5] &quot;Biology and life sciences&quot;         
-#&gt;  [6] &quot;Ecology&quot;                           
-#&gt;  [7] &quot;Ecosystems&quot;                        
-#&gt;  [8] &quot;Ecology and environmental sciences&quot;
-#&gt;  [9] &quot;Ecology&quot;                           
-#&gt; [10] &quot;Ecosystems&quot;                        
-#&gt; [11] &quot;Ecology and environmental sciences&quot;
-#&gt; [12] &quot;Conservation science&quot;              
-#&gt; [13] &quot;Earth sciences&quot;                    
-#&gt; [14] &quot;Geography&quot;                         
-#&gt; [15] &quot;Human geography&quot;                   
-#&gt; [16] &quot;Land use&quot;                          
-#&gt; [17] &quot;Social sciences&quot;                   
-#&gt; [18] &quot;Human geography&quot;                   
-#&gt; [19] &quot;Land use&quot;                          
-#&gt; [20] &quot;Biology and life sciences&quot;         
-#&gt; [21] &quot;Ecology&quot;                           
-#&gt; [22] &quot;Ecosystems&quot;                        
-#&gt; [23] &quot;Ecosystem functioning&quot;             
-#&gt; [24] &quot;Ecology and environmental sciences&quot;
-#&gt; [25] &quot;Ecology&quot;                           
-#&gt; [26] &quot;Ecosystems&quot;                        
-#&gt; [27] &quot;Ecosystem functioning&quot;             
-#&gt; [28] &quot;Biology and life sciences&quot;         
-#&gt; [29] &quot;Ecology&quot;                           
-#&gt; [30] &quot;Ecological metrics&quot;                
-#&gt; [31] &quot;Productivity (ecology)&quot;            
-#&gt; [32] &quot;Ecology and environmental sciences&quot;
-#&gt; [33] &quot;Ecology&quot;                           
-#&gt; [34] &quot;Ecological metrics&quot;                
-#&gt; [35] &quot;Productivity (ecology)&quot;            
-#&gt; [36] &quot;Biology and life sciences&quot;         
-#&gt; [37] &quot;Ecology&quot;                           
-#&gt; [38] &quot;Theoretical ecology&quot;               
-#&gt; [39] &quot;Ecology and environmental sciences&quot;
-#&gt; [40] &quot;Ecology&quot;                           
-#&gt; [41] &quot;Theoretical ecology&quot;               
-#&gt; [42] &quot;Social sciences&quot;                   
-#&gt; [43] &quot;Economics&quot;                         
+#&gt; $plos$`10.1371/journal.pone.0155019`$title
+#&gt; [1] &quot;Focusing Conservation Efforts on Ecosystem Service Supply May Increase Vulnerability of Socio-Ecological Systems&quot;
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0080763`
+#&gt; $plos$`10.1371/journal.pone.0080763`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0080763&quot;
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0080763`$title
+#&gt; [1] &quot;Disproportional Representation of Primates in the Ecological Literature&quot;
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0150648`
+#&gt; $plos$`10.1371/journal.pone.0150648`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0150648&quot;
+#&gt; 
+#&gt; $plos$`10.1371/journal.pone.0150648`$title
+#&gt; [1] &quot;Quantifying Ecological Literacy in an Adult Western Community: The Development and Application of a New Assessment Tool and Community Standard&quot;
+#&gt; 
+#&gt; 
+#&gt; $plos$`10.1371/journal.pcbi.1003594`
+#&gt; $plos$`10.1371/journal.pcbi.1003594`$doi
+#&gt; [1] &quot;10.1371/journal.pcbi.1003594&quot;
+#&gt; 
+#&gt; $plos$`10.1371/journal.pcbi.1003594`$title
+#&gt; [1] &quot;Ecological Consistency of SSU rRNA-Based Operational Taxonomic Units at a Global Scale&quot;
 #&gt; 
 #&gt; 
 #&gt; $plos$`10.1371/journal.pone.0102437`
 #&gt; $plos$`10.1371/journal.pone.0102437`$doi
 #&gt; [1] &quot;10.1371/journal.pone.0102437&quot;
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0102437`$categories
-#&gt;  [1] &quot;Research Article&quot;                  
-#&gt;  [2] &quot;Biology and life sciences&quot;         
-#&gt;  [3] &quot;Biogeography&quot;                      
-#&gt;  [4] &quot;Ecology&quot;                           
-#&gt;  [5] &quot;Ecosystems&quot;                        
-#&gt;  [6] &quot;Ecosystem engineering&quot;             
-#&gt;  [7] &quot;Ecosystem functioning&quot;             
-#&gt;  [8] &quot;Industrial ecology&quot;                
-#&gt;  [9] &quot;Spatial and landscape ecology&quot;     
-#&gt; [10] &quot;Urban ecology&quot;                     
-#&gt; [11] &quot;Computer and information sciences&quot; 
-#&gt; [12] &quot;Geoinformatics&quot;                    
-#&gt; [13] &quot;Spatial analysis&quot;                  
-#&gt; [14] &quot;Earth sciences&quot;                    
-#&gt; [15] &quot;Geography&quot;                         
-#&gt; [16] &quot;Human geography&quot;                   
-#&gt; [17] &quot;Cultural geography&quot;                
-#&gt; [18] &quot;Social geography&quot;                  
-#&gt; [19] &quot;Ecology and environmental sciences&quot;
-#&gt; [20] &quot;Conservation science&quot;              
-#&gt; [21] &quot;Environmental protection&quot;          
-#&gt; [22] &quot;Nature-society interactions&quot;       
+#&gt; $plos$`10.1371/journal.pone.0102437`$title
+#&gt; [1] &quot;Combining Aesthetic with Ecological Values for Landscape Sustainability&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0017342`
-#&gt; $plos$`10.1371/journal.pone.0017342`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0017342&quot;
+#&gt; $plos$`10.1371/journal.pone.0175014`
+#&gt; $plos$`10.1371/journal.pone.0175014`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0175014&quot;
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0017342`$categories
-#&gt;  [1] &quot;Research Article&quot;     &quot;Biology&quot;              &quot;Ecology&quot;             
-#&gt;  [4] &quot;Community ecology&quot;    &quot;Community assembly&quot;   &quot;Community structure&quot; 
-#&gt;  [7] &quot;Niche construction&quot;   &quot;Ecological metrics&quot;   &quot;Species diversity&quot;   
-#&gt; [10] &quot;Species richness&quot;     &quot;Biodiversity&quot;         &quot;Biogeography&quot;        
-#&gt; [13] &quot;Population ecology&quot;   &quot;Mathematics&quot;          &quot;Statistics&quot;          
-#&gt; [16] &quot;Biostatistics&quot;        &quot;Statistical theories&quot; &quot;Ecology&quot;             
-#&gt; [19] &quot;Mathematics&quot;         
+#&gt; $plos$`10.1371/journal.pone.0175014`$title
+#&gt; [1] &quot;75 years of dryland science: Trends and gaps in arid ecology literature&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0140306`
-#&gt; $plos$`10.1371/journal.pone.0140306`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0140306&quot;
+#&gt; $plos$`10.1371/journal.pone.0166559`
+#&gt; $plos$`10.1371/journal.pone.0166559`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0166559&quot;
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0140306`$categories
-#&gt; [1] &quot;Correction&quot;
-#&gt; 
-#&gt; 
-#&gt; $plos$`10.1371/journal.pone.0092931`
-#&gt; $plos$`10.1371/journal.pone.0092931`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0092931&quot;
-#&gt; 
-#&gt; $plos$`10.1371/journal.pone.0092931`$categories
-#&gt; [1] &quot;Correction&quot;
+#&gt; $plos$`10.1371/journal.pone.0166559`$title
+#&gt; [1] &quot;Eliciting and Representing High-Level Knowledge Requirements to Discover Ecological Knowledge in Flower-Visiting Data&quot;
 #&gt; 
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0091497`
-#&gt; $plos$`10.1371/journal.pone.0091497`$doi
-#&gt; [1] &quot;10.1371/journal.pone.0091497&quot;
+#&gt; $plos$`10.1371/journal.pone.0054689`
+#&gt; $plos$`10.1371/journal.pone.0054689`$doi
+#&gt; [1] &quot;10.1371/journal.pone.0054689&quot;
 #&gt; 
-#&gt; $plos$`10.1371/journal.pone.0091497`$categories
-#&gt; [1] &quot;Correction&quot;
+#&gt; $plos$`10.1371/journal.pone.0054689`$title
+#&gt; [1] &quot;Representation of Ecological Systems within the Protected Areas Network of the Continental United States&quot;
 </code></pre>
 
-<p><code>tabularize</code> attempts to help you put the data that comes out of <code>chunks()</code> in to a <code>data.frame</code>, that we all know and love. </p>
+<p><code>ft_tabularize</code> attempts to help you put the data that comes out of 
+<code>ft_chunks()</code> in to a <code>data.frame</code>, that we all know and love. </p>
 
-<pre><code class="r">x %&gt;% chunks(c(&quot;doi&quot;, &quot;history&quot;)) %&gt;% tabularize()
+<pre><code class="r">x %&gt;% ft_collect() %&gt;% ft_chunks(c(&quot;doi&quot;, &quot;history&quot;)) %&gt;% ft_tabularize()
 #&gt; $plos
-#&gt;                            doi history.received history.accepted
-#&gt; 1 10.1371/journal.pone.0059813       2012-09-16       2013-02-19
-#&gt; 2 10.1371/journal.pone.0001248       2007-07-02       2007-11-06
-#&gt; 3 10.1371/journal.pone.0080763       2013-08-15       2013-10-16
-#&gt; 4 10.1371/journal.pone.0155019       2015-09-22       2016-04-22
-#&gt; 5 10.1371/journal.pone.0102437       2013-11-27       2014-06-19
-#&gt; 6 10.1371/journal.pone.0017342       2010-08-24       2011-01-31
-#&gt; 7 10.1371/journal.pone.0140306             &lt;NA&gt;             &lt;NA&gt;
-#&gt; 8 10.1371/journal.pone.0092931             &lt;NA&gt;             &lt;NA&gt;
-#&gt; 9 10.1371/journal.pone.0091497             &lt;NA&gt;             &lt;NA&gt;
+#&gt;                             doi history.received history.accepted
+#&gt; 1  10.1371/journal.pone.0001248       2007-07-02       2007-11-06
+#&gt; 2  10.1371/journal.pone.0059813       2012-09-16       2013-02-19
+#&gt; 3  10.1371/journal.pone.0155019       2015-09-22       2016-04-22
+#&gt; 4  10.1371/journal.pone.0080763       2013-08-15       2013-10-16
+#&gt; 5  10.1371/journal.pone.0150648       2015-09-19       2016-02-16
+#&gt; 6  10.1371/journal.pcbi.1003594       2014-01-09       2014-03-14
+#&gt; 7  10.1371/journal.pone.0102437       2013-11-27       2014-06-19
+#&gt; 8  10.1371/journal.pone.0175014       2016-09-23       2017-03-20
+#&gt; 9  10.1371/journal.pone.0166559       2016-06-05       2016-10-30
+#&gt; 10 10.1371/journal.pone.0054689       2012-03-22       2012-12-17
 </code></pre>
 
 </body>

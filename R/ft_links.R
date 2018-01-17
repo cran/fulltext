@@ -1,18 +1,18 @@
 #' Get full text links
 #'
 #' @export
-#' @param x One of \code{ft}, \code{ft_ind}, or a character string of DOIs.
-#' @param from Source to query. Ignored when \code{ft_ind} class passed.
-#' @param plosopts PLOS options. See \code{?searchplos}
-#' @param bmcopts BMC options. See \code{?bmc_search}
-#' @param crossrefopts Crossref options. See \code{?cr_works}
-#' @param entrezopts Entrez options. See \code{?entrez_search}
-#' @param ... Further args passed on to \code{\link[httr]{GET}}. Not working right now...
+#' @param x One of `ft`, `ft_ind`, or a character string of DOIs.
+#' @param from Source to query. Ignored when `ft_ind` class passed.
+#' @param plosopts PLOS options. See `?searchplos`
+#' @param bmcopts BMC options. See `?bmc_search`
+#' @param crossrefopts Crossref options. See `?cr_works`
+#' @param entrezopts Entrez options. See `?entrez_search`
+#' @param ... ignored right now
 #'
-#' @return An object of class ft_links, with either a list or data.frame for each 
-#' DOI, with links for XML and PDF links (typically). 
+#' @return An object of class ft_links, with either a list or data.frame for 
+#' each DOI, with links for XML and PDF links (typically). 
 #' 
-#' @details Inputs can be an object of class \code{ft}, \code{ft_ind}, or a 
+#' @details Inputs can be an object of class `ft`, `ft_ind`, or a 
 #' character string of DOIs. You can specify a specific source for four sources
 #' (PLOS, BMC, Crossref, and Entrez), but any other publishers we guess the 
 #' publisher form the input DOI(s), then attempt to generate full text links 
@@ -22,8 +22,16 @@
 #' Strategy varies by publisher. For some we can construct XML and PDF links 
 #' only from the DOI. For others, we need to make an HTTP request to the 
 #' publisher to get additional information - this of course makes things slower.
-#'
-#' @examples \dontrun{
+#' 
+#' See **Rate Limits** and **Authentication** in 
+#' [fulltext-package] for rate limiting and authentication information,
+#' respectively
+#' 
+#' @examples 
+#' # List publishers included
+#' ft_links_ls()
+#' 
+#' \dontrun{
 #' # Entrez
 #' (res1 <- ft_search(query='ecology', from='entrez'))
 #' res1$entrez$data$doi
@@ -50,13 +58,15 @@
 #' (out <- ft_links(res2$crossref))
 #' out$crossref
 #' ## from character vector of DOIs
-#' x <- c("10.1016/s1754-5048(14)00139-1", "10.1016/b978-0-12-378260-1.50017-8")
+#' x <- c("10.1016/s1754-5048(14)00139-1", 
+#'        "10.1016/b978-0-12-378260-1.50017-8")
 #' (out2 <- ft_links(x, from = "crossref"))
 #' out2$crossref
 #' 
 #' # PLOS
 #' (res3 <- ft_search(query='ecology', from='plos', plosopts=list(
-#'    fl=c('id','author','eissn','journal','counter_total_all','alm_twitterCount'))))
+#'    fl=c('id','author','eissn','journal','counter_total_all',
+#'         'alm_twitterCount'))))
 #' res3$plos$data$id
 #' ## directly from ft_search output
 #' (out <- ft_links(res3))
@@ -94,6 +104,14 @@
 #' ft_links('10.7717/peerj.228')
 #' ft_links(c('10.7717/peerj.228', '10.7717/peerj.1200'))
 #' 
+#' ## wiley
+#' res <- ft_links('10.1006/asle.2001.0035', from = "crossref")
+#' res$crossref$data[[1]]$url
+#' 
+#' ## informa
+#' res <- ft_links('10.1174/02134749660569378', from = "crossref")
+#' res$crossref$data[[1]]$url
+#' 
 #' ## frontiersin
 #' (res <- ft_links('10.3389/fphar.2014.00109'))
 #' res$frontiersin
@@ -122,7 +140,6 @@ ft_links <- function(x, from = NULL, plosopts = list(), crossrefopts = list(),
 }
 
 #' @export
-#' @rdname ft_links
 ft_links.ft <- function(x, from = NULL, 
                         plosopts = list(),
                         crossrefopts = list(),
@@ -140,7 +157,6 @@ ft_links.ft <- function(x, from = NULL,
 }
 
 #' @export
-#' @rdname ft_links
 ft_links.ft_ind <- function(x, from = NULL, 
                         plosopts = list(),
                         crossrefopts = list(),
@@ -158,7 +174,6 @@ ft_links.ft_ind <- function(x, from = NULL,
 }
 
 #' @export
-#' @rdname ft_links
 ft_links.character <- function(x, from = NULL, 
                         plosopts = list(),
                         crossrefopts = list(),
@@ -182,10 +197,18 @@ ft_links.character <- function(x, from = NULL,
 }
 
 #' @export
+#' @rdname ft_links
+ft_links_ls <- function() {
+  nms <- ls(getNamespace("fulltext"), all.names = TRUE, pattern = "plugin_links_")
+  gsub("plugin_links_", "", nms)
+}
+
+
+#' @export
 print.ft_links <- function(x, ...) {
   cat("<fulltext links>", sep = "\n")
   alldois <- unlist(ft_compact(pluck(x, "ids")))
-  namesprint <- paste(na.omit(alldois[1:10]), collapse = " ")
+  namesprint <- paste(stats::na.omit(alldois[1:10]), collapse = " ")
   totgot <- sum(unlist(pluck(x, "found")))
   cat(sprintf("[Found] %s", totgot), "\n")
   cat(ft_wrap(sprintf("[IDs]\n %s ...", namesprint)), "\n\n")

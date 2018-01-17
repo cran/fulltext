@@ -9,46 +9,51 @@ _/ ____\_ __|  | |  |_/  |_  ____ ___  ____/  |_
                                 \/      \/
 ```
 
-__Get full text articles from (almost) anywhere__
-
-[![Build Status](https://api.travis-ci.org/ropensci/fulltext.png)](https://travis-ci.org/ropensci/fulltext)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![Build Status](https://api.travis-ci.org/ropensci/fulltext.svg)](https://travis-ci.org/ropensci/fulltext)
 [![Build status](https://ci.appveyor.com/api/projects/status/y487h3ec5wc2s20m/branch/master?svg=true)](https://ci.appveyor.com/project/sckott/fulltext/branch/master)
 [![codecov.io](https://codecov.io/github/ropensci/fulltext/coverage.svg?branch=master)](https://codecov.io/github/ropensci/fulltext?branch=master)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/fulltext)](https://github.com/metacran/cranlogs.app)
 [![cran version](http://www.r-pkg.org/badges/version/fulltext)](https://cran.r-project.org/package=fulltext)
 
+__Get full text articles from lots of places__
+
+Checkout the [fulltext manual](https://ropensci.github.io/fulltext-book/) to get started.
+
+-----
+
 rOpenSci has a number of R packages to get either full text, metadata, or both from various publishers. The goal of `fulltext` is to integrate these packages to create a single interface to many data sources.
 
 `fulltext` makes it easy to do text-mining by supporting the following steps:
 
-* Search for articles
-* Fetch articles
-* Get links for full text articles (xml, pdf)
-* Extract text from articles / convert formats
-* Collect bits of articles that you actually need
-* Download supplementary materials from papers
+* Search for articles - `ft_search`
+* Fetch articles - `ft_get`
+* Get links for full text articles (xml, pdf) - `ft_links`
+* Extract text from articles / convert formats - `ft_extract`
+* Collect bits of articles that you actually need - `ft_chunks`/`ft_tabularize`
+* Collect all texts into a data.frame - `ft_table`
+* Download supplementary materials from papers - `ft_get_si`
 
-Additional steps we hope to include in future versions:
-
-* Analysis enabled via the [tm](https://cran.r-project.org/package=tm) package and friends, and via [Spark-R](https://amplab-extras.github.io/SparkR-pkg/) to handle especially large jobs
-* Visualization
+It's easy to go from the outputs of `ft_get` to text-mining packages such as 
+[tm](https://cran.r-project.org/package=tm) and 
+[quanteda](https://cran.r-project.org/package=quanteda).
 
 Data sources in `fulltext` include:
 
 * [Crossref](http://www.crossref.org/) - via the `rcrossref` package
 * [Public Library of Science (PLOS)](https://www.plos.org/) - via the `rplos` package
-* [Biomed Central](http://www.biomedcentral.com/)
+* Biomed Central
 * [arXiv](https://arxiv.org) - via the `aRxiv` package
 * [bioRxiv](http://biorxiv.org/) - via the `biorxivr` package
 * [PMC/Pubmed via Entrez](http://www.ncbi.nlm.nih.gov/) - via the `rentrez` package
-* Many more are supported via the above sources (e.g., _Royal Society Open Science_ is 
+* Many more are supported via the above sources (e.g., _Royal Society Open Science_ is
 available via Pubmed)
 * We __will__ add more, as publishers open up, and as we have time...See the [master list here](https://github.com/ropensci/fulltext/issues/4#issuecomment-52376743)
 
 Authorization: A number of publishers require authorization via API key, and some even more
 draconian authorization processes involving checking IP addresses. We are working on supporting
 all the various authorization things for different publishers, but of course all the OA content
-is already easily available. 
+is already easily available.
 
 We'd love your feedback. Let us know what you think in [the issue tracker](https://github.com/ropensci/fulltext/issues)
 
@@ -77,27 +82,19 @@ Load library
 library('fulltext')
 ```
 
-## Extraction tools
-
-If you want to use `ft_extract()` function, it currently has two options for how to extract text from PDFs: `xpdf` and `ghostscript`. 
-
-* `xpdf` installation: See http://www.foolabs.com/xpdf/download.html for instructions on how to download and install `xpdf`. For OSX, you an also get `xpdf` via [Homebrew](https://github.com/homebrew/homebrew-x11/blob/master/xpdf.rb) with `brew install xpdf`. Apparently, you can optionally install Poppler, which is built on `xpdf`. Get it at http://poppler.freedesktop.org/
-* `ghostscript` installation: See http://www.ghostscript.com/doc/9.16/Install.htm  
-for instructions on how to download and install `ghostscript`. For OSX, you an also get `ghostscript` via <https://github.com/Homebrew/homebrew-core/blob/master/Formula/ghostscript.rb> with `brew install gs`.
-
 ## Search
 
 `ft_search()` - get metadata on a search query.
 
 
 ```r
-ft_search(query = 'ecology', from = 'plos')
+ft_search(query = 'ecology', from = 'crossref')
 #> Query:
 #>   [ecology] 
 #> Found:
-#>   [PLoS: 33966; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0] 
+#>   [PLoS: 0; BMC: 0; Crossref: 144283; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
 #> Returned:
-#>   [PLoS: 10; BMC: 0; Crossref: 0; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0]
+#>   [PLoS: 0; BMC: 0; Crossref: 10; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]
 ```
 
 ## Get full text links
@@ -109,8 +106,8 @@ ft_search(query = 'ecology', from = 'plos')
 res1 <- ft_search(query = 'ecology', from = 'entrez', limit = 5)
 ft_links(res1)
 #> <fulltext links>
-#> [Found] 3 
-#> [IDs] ID_27439703 ID_27439360 ID_27434666 ...
+#> [Found] 5 
+#> [IDs] ID_29321529 ID_29321528 ID_29321519 ID_29321473 ID_29319501 ...
 ```
 
 Or pass in DOIs directly
@@ -119,8 +116,8 @@ Or pass in DOIs directly
 ```r
 ft_links(res1$entrez$data$doi, from = "entrez")
 #> <fulltext links>
-#> [Found] 3 
-#> [IDs] ID_27439703 ID_27439360 ID_27434666 ...
+#> [Found] 5 
+#> [IDs] ID_29321529 ID_29321528 ID_29321519 ID_29321473 ID_29319501 ...
 ```
 
 ## Get full text
@@ -129,44 +126,34 @@ ft_links(res1$entrez$data$doi, from = "entrez")
 
 
 ```r
-ft_get('10.1371/journal.pone.0086169', from = 'plos')
+ft_get('10.7717/peerj.228')
 #> <fulltext text>
 #> [Docs] 1 
-#> [Source] R session  
-#> [IDs] 10.1371/journal.pone.0086169 ...
+#> [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
+#> [IDs] 10.7717/peerj.228 ...
 ```
 
 ## Extract chunks
 
 
 ```r
-library("rplos")
-(dois <- searchplos(q = "*:*", fl = 'id',
-   fq = list('doc_type:full',"article_type:\"research article\""), limit = 5)$data$id)
-#> [1] "10.1371/journal.pone.0063114" "10.1371/journal.pone.0039479"
-#> [3] "10.1371/journal.pone.0003940" "10.1371/journal.pcbi.0030082"
-#> [5] "10.1371/journal.pone.0051856"
-x <- ft_get(dois, from = "plos")
-x %>% chunks("publisher") %>% tabularize()
-#> $plos
-#>                                     publisher
-#> 1 Public Library of ScienceSan Francisco, USA
-#> 2 Public Library of ScienceSan Francisco, USA
-#> 3 Public Library of ScienceSan Francisco, USA
-#> 4 Public Library of ScienceSan Francisco, USA
-#> 5 Public Library of ScienceSan Francisco, USA
+x <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'), from = "elife")
+x %>% ft_collect() %>% ft_chunks("publisher") %>% ft_tabularize()
+#> $elife
+#>                          publisher
+#> 1 eLife Sciences Publications, Ltd
+#> 2 eLife Sciences Publications, Ltd
 ```
+
+Get multiple fields at once
 
 
 ```r
-x %>% chunks(c("doi","publisher")) %>% tabularize()
-#> $plos
-#>                            doi                                   publisher
-#> 1 10.1371/journal.pone.0063114 Public Library of ScienceSan Francisco, USA
-#> 2 10.1371/journal.pone.0039479 Public Library of ScienceSan Francisco, USA
-#> 3 10.1371/journal.pone.0003940 Public Library of ScienceSan Francisco, USA
-#> 4 10.1371/journal.pcbi.0030082 Public Library of ScienceSan Francisco, USA
-#> 5 10.1371/journal.pone.0051856 Public Library of ScienceSan Francisco, USA
+x %>% ft_collect() %>% ft_chunks(c("doi","publisher")) %>% ft_tabularize()
+#> $elife
+#>                   doi                        publisher
+#> 1 10.7554/eLife.03032 eLife Sciences Publications, Ltd
+#> 2 10.7554/eLife.32763 eLife Sciences Publications, Ltd
 ```
 
 Use `dplyr` to data munge
@@ -175,28 +162,20 @@ Use `dplyr` to data munge
 ```r
 library("dplyr")
 x %>%
- chunks(c("doi", "publisher", "permissions")) %>%
- tabularize() %>%
- .$plos %>%
- select(-permissions.license)
-#>                            doi                                   publisher
-#> 1 10.1371/journal.pone.0063114 Public Library of ScienceSan Francisco, USA
-#> 2 10.1371/journal.pone.0039479 Public Library of ScienceSan Francisco, USA
-#> 3 10.1371/journal.pone.0003940 Public Library of ScienceSan Francisco, USA
-#> 4 10.1371/journal.pcbi.0030082 Public Library of ScienceSan Francisco, USA
-#> 5 10.1371/journal.pone.0051856 Public Library of ScienceSan Francisco, USA
-#>   permissions.copyright.year permissions.copyright.holder
-#> 1                       2013              Schaafsma et al
-#> 2                       2012            Novoseltsev et al
-#> 3                       2008                Luchman et al
-#> 4                       2007                Puccini et al
-#> 5                       2012              Ambrosini et al
-#>   permissions.license_url
-#> 1                    <NA>
-#> 2                    <NA>
-#> 3                    <NA>
-#> 4                    <NA>
-#> 5                    <NA>
+  ft_collect() %>% 
+  ft_chunks(c("doi", "publisher", "permissions")) %>%
+  ft_tabularize() %>%
+  .$elife %>%
+  select(-permissions.license, -permissions.license_url)
+#>                   doi                        publisher
+#> 1 10.7554/eLife.03032 eLife Sciences Publications, Ltd
+#> 2 10.7554/eLife.32763 eLife Sciences Publications, Ltd
+#>   permissions.copyright.statement permissions.copyright.year
+#> 1              © 2014, Zhao et al                       2014
+#> 2            © 2017, Mhatre et al                       2017
+#>   permissions.copyright.holder permissions.free_to_read
+#> 1                   Zhao et al                     <NA>
+#> 2                 Mhatre et al
 ```
 
 ## Supplementary materials
@@ -208,114 +187,63 @@ Grab supplementary materials for (re-)analysis of data
 
 ```r
 catching.crabs <- read.csv(ft_get_si("10.6084/m9.figshare.979288", 2))
-#> Error in ft_get_si.character("10.6084/m9.figshare.979288", 2): '...' used in an incorrect context
 head(catching.crabs)
-#> Error in head(catching.crabs): object 'catching.crabs' not found
-```
-
-## Cache
-
-When dealing with full text data, you can get a lot quickly, and it can take a long time to get. That's where caching comes in. And after you pull down a bunch of data, if you do so within the R session, you don't want to lose that data if the session crashes, etc. When you search you _will be able to_ (i.e., not ready yet) optionally cache the raw JSON/XML/etc. of each request locally - when you do that exact search again we'll just give you the local data - unless of course you want new data, which you can do.
-
-
-```r
-ft_get('10.1371/journal.pone.0086169', from='plos', cache=TRUE)
+#>   trap.no. length.deployed no..crabs
+#> 1        1          10 sec         0
+#> 2        2          10 sec         0
+#> 3        3          10 sec         0
+#> 4        4          10 sec         0
+#> 5        5          10 sec         0
+#> 6        1           1 min         0
 ```
 
 ## Extract text from PDFs
 
 There are going to be cases in which some results you find in `ft_search()` have full text available in text, xml, or other machine readable formats, but some may be open access, but only in pdf format. We have a series of convenience functions in this package to help extract text from pdfs, both locally and remotely.
 
-Locally, using code adapted from the package `tm`, and various pdf to text parsing backends
+Locally, using code adapted from the package `tm`, and two pdf to text parsing backends
 
 
 ```r
 pdf <- system.file("examples", "example2.pdf", package = "fulltext")
 ```
 
-Using `ghostscript`
-
 
 ```r
-(res_gs <- ft_extract(pdf, "gs"))
-#> <document>/Users/sacmac/github/ropensci/fulltext/inst/examples/example2.pdf
+ft_extract(pdf)
+#> <document>/Library/Frameworks/R.framework/Versions/3.4/Resources/library/fulltext/examples/example2.pdf
 #>   Title: pone.0107412 1..10
 #>   Producer: Acrobat Distiller 9.0.0 (Windows); modified using iText 5.0.3 (c) 1T3XT BVBA
 #>   Creation date: 2014-09-18
 ```
 
-Using `xpdf`
+### Interoperability with other packages downstream
 
 
 ```r
-(res_xpdf <- ft_extract(pdf, "xpdf"))
-#> <document>/Users/sacmac/github/ropensci/fulltext/inst/examples/example2.pdf
-#>   Pages: 10
-#>   Title: pone.0107412 1..10
-#>   Producer: Acrobat Distiller 9.0.0 (Windows); modified using iText 5.0.3 (c) 1T3XT BVBA
-#>   Creation date: 2014-09-18
-```
-
-Or extract directly into a `tm` Corpus
-
-
-```r
-paths <- sapply(paste0("example", 2:5, ".pdf"), function(x) system.file("examples", x, package = "fulltext"))
-(corpus_xpdf <- ft_extract_corpus(paths, "xpdf"))
-#> $meta
-#>           names                           class
-#> 1 content, meta PlainTextDocument, TextDocument
-#> 2 content, meta PlainTextDocument, TextDocument
-#> 3 content, meta PlainTextDocument, TextDocument
-#> 4 content, meta PlainTextDocument, TextDocument
-#> 
-#> $data
-#> <<VCorpus>>
-#> Metadata:  corpus specific: 0, document level (indexed): 0
-#> Content:  documents: 4
-#> 
-#> attr(,"class")
-#> [1] "xpdf"
-```
-
-Extract pdf remotely on the web, using a service called `PDFX`
-
-
-```r
-pdf5 <- system.file("examples", "example5.pdf", package = "fulltext")
-pdfx(file = pdf5)
+cache_options_set(path = (td <- 'foobar'))
+res <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'), type = "pdf")
+library(readtext)
+x <- readtext::readtext(file.path(cache_options_get()$path, "*.pdf"))
 ```
 
 
 ```r
-#> $meta
-#> $meta$job
-#> [1] "34b281c10730b9e777de8a29b2dbdcc19f7d025c71afe9d674f3c5311a1f2044"
-#>
-#> $meta$base_name
-#> [1] "5kpp"
-#>
-#> $meta$doi
-#> [1] "10.7554/eLife.03640"
-#>
-#>
-#> $data
-#> <?xml version="1.0" encoding="UTF-8"?>
-#> <pdfx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://pdfx.cs.man.ac.uk/static/article-schema.xsd">
-#>   <meta>
-#>     <job>34b281c10730b9e777de8a29b2dbdcc19f7d025c71afe9d674f3c5311a1f2044</job>
-#>     <base_name>5kpp</base_name>
-#>     <doi>10.7554/eLife.03640</doi>
-#>   </meta>
-#>    <article>
-#>  .....
+library(quanteda)
+quanteda::corpus(x)
+#> Corpus consisting of 2 documents and 1 docvar.
 ```
+
+## Contributors
+
+* Scott Chamberlain <http://github.com/sckott>
+* Will Pearse <https://github.com/willpearse>
 
 ## Meta
 
 * Please [report any issues or bugs](https://github.com/ropensci/fulltext/issues).
 * License: MIT
 * Get citation information for `fulltext`: `citation(package = 'fulltext')`
-* Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-[![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+[![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)

@@ -2,50 +2,43 @@
 % Please edit documentation in R/cache.R
 \name{cache}
 \alias{cache}
-\alias{cache_clear}
-\alias{cache_options_get}
 \alias{cache_options_set}
-\title{Cache blobs of json, xml or pdfs of text from ft_get() function}
+\alias{cache_options_get}
+\title{Set or get cache options}
 \usage{
-cache_options_set(cache = TRUE, backend = "rds", path = "~/.fulltext")
+cache_options_set(path = "fulltext", backend = "ext", overwrite = FALSE)
 
 cache_options_get()
-
-cache_clear(cachetype = NULL)
 }
 \arguments{
-\item{cache}{(logical) If TRUE, cache results, if not objects saved within R session.}
+\item{path}{(character) End of directory path. Default: "fulltext".
+See Details.}
 
-\item{backend}{(character) One of rds, rcache, redis}
+\item{backend}{(character) Only "ext" supported for now.}
 
-\item{path}{path to local storage. used only if \code{backend="rds"}}
-
-\item{cachetype}{The cache type}
+\item{overwrite}{(logical) overwrite cached file or not. Default: \code{FALSE}}
 }
 \description{
-Cache blobs of json, xml or pdfs of text from ft_get() function
+Set or get cache options
 }
+\section{Managing cached files}{
+
+The dafault cache directory is \code{paste0(rappdirs::user_cache_dir(), "/R/fulltext")},
+but you can set your own path using \code{cache_path_set()}
+
+\code{cache_delete} only accepts 1 file name, while
+\code{cache_delete_all} doesn't accept any names, but deletes all files.
+For deleting many specific files, use \code{cache_delete} in a \code{\link[=lapply]{lapply()}}
+type call
+}
+
 \examples{
 \dontrun{
-ft_get('10.1371/journal.pone.0086169', from='plos', cache=FALSE)
-ft_get('10.1371/journal.pone.0086169', from='plos', cache=TRUE)
-
-cache_options_set(backend="redis")
 cache_options_get()
-(x <- ft_get('10.1371/journal.pone.0086169', from='plos', cache=TRUE, backend="redis"))
-x \%>\% collect()
-
-cache_options_set(backend="rcache")
+cache_options_set(path = "foobar")
 cache_options_get()
-(x <- ft_get('10.1371/journal.pone.0086169', from='plos'))
-x \%>\% collect()
-
-# Many different sources
-(res <- ft_search(query='ecology', from='entrez'))
-cache_options_set(backend="rds")
-out <- ft_get(res)
-out$entrez
-out \%>\% collect() \%>\% chunks("title")
 }
 }
-
+\seealso{
+\link{ftxt_cache}
+}

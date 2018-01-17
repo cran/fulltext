@@ -13,7 +13,7 @@ ft_providers(journal = NULL, publisher = NULL, limit = 10, ...)
 
 \item{limit}{Number of records to return.}
 
-\item{...}{Further args passed on to \code{\link[httr]{GET}}}
+\item{...}{Further args passed on to \link[crul:HttpClient]{crul::HttpClient}}
 }
 \value{
 An object of class ft_p
@@ -28,4 +28,3 @@ ft_providers(publisher="hindawi")
 ft_providers(publisher="journal")
 }
 }
-

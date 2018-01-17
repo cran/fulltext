@@ -10,8 +10,8 @@ ft_browse(x, what = "macrodocs", browse = TRUE)
 ft_browse_sections(x, what = "abstract", output = NULL, browse = TRUE)
 }
 \arguments{
-\item{x}{An object of class \code{ft_data} - the output from a call to 
-\code{\link{ft_get}}}
+\item{x}{An object of class \code{ft_data} - the output from a call to
+\code{\link[=ft_get]{ft_get()}}}
 
 \item{what}{(character) One of macrodocs (default), publisher, or whisker.}
 
@@ -38,17 +38,5 @@ ft_browse( ft_get('10.3389/fphar.2014.00109', from="entrez") )
 
 # open to publisher site
 ft_browse(x, "publisher")
-
-# Browse sections
-x <- ft_get(c('10.1371/journal.pone.0086169',"10.1371/journal.pone.0110535"), from='plos')
-ft_browse_sections(x, "abstract")
-ft_browse_sections(x, "categories")
-
-opts <- list(fq=list('doc_type:full',"article_type:\\"research article\\""))
-out <- ft_search(query='ecology', from='plos', plosopts = opts)$plos$data$id \%>\%
- ft_get(from = "plos")
-out \%>\% ft_browse_sections("abstract")
-out \%>\% ft_browse_sections("body")
 }
 }
-

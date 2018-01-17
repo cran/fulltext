@@ -1,4 +1,4 @@
-plugin_plos <- function(sources, query, limit, opts){
+plugin_search_plos <- function(sources, query, limit, start, opts){
   if (any(grepl("plos", sources))) {
     opts$q <- query
     opts$limit <- limit
@@ -10,7 +10,7 @@ plugin_plos <- function(sources, query, limit, opts){
                               the terms of the Creative Commons Attribution License, which permits
                               unrestricted use, distribution, and reproduction in any medium,
                               provided the original author and source are credited.'))
-    if (!is(zz$data, "data.frame")) zz$data <- data.frame(NULL)
+    if (!inherits(zz$data, "data.frame")) zz$data <- data.frame(NULL)
     zz <- names_lower(zz)
     structure(zz, class = "ft_ind", query = query)
   } else {
@@ -19,14 +19,19 @@ plugin_plos <- function(sources, query, limit, opts){
   }
 }
 
-plugin_crossref <- function(sources, query, limit, opts){
+plugin_search_crossref <- function(sources, query, limit, start, opts){
   if (any(grepl("crossref", sources))) {
     opts$query <- query
     opts$limit <- limit
-    opts$filter <- c(has_license = TRUE)
+    opts$offset <- start
+    if ("filter" %in% names(opts)) {
+      opts$filter <- c(c(has_license = TRUE), opts$filter)
+    } else {
+      opts$filter <- c(has_license = TRUE)  
+    }
     out <- do.call(cr_works, opts)
     out$data <- names_lower(out$data)
-    zz <- list(source = "crossref", found = out$meta$total_results, data = out$data, opts = opts, 
+    zz <- list(source = "crossref", found = out$meta$total_results, data = out$data, opts = opts,
                license = list(type = "variable, see individual records"))
     structure(zz, class = "ft_ind", query = query)
   } else {
@@ -35,7 +40,7 @@ plugin_crossref <- function(sources, query, limit, opts){
   }
 }
 
-plugin_bmc <- function(sources, query, limit, opts){
+plugin_search_bmc <- function(sources, query, limit, start, opts){
   if (any(grepl("bmc", sources))) {
     opts$query <- query
     opts$limit <- limit
@@ -52,7 +57,7 @@ plugin_bmc <- function(sources, query, limit, opts){
   }
 }
 
-plugin_entrez <- function(sources, query, limit, opts){
+plugin_search_entrez <- function(sources, query, limit, start, opts){
   if (any(grepl("entrez", sources))) {
     opts$db <- "pmc"
     opts$term <- query
@@ -82,7 +87,7 @@ plugin_entrez <- function(sources, query, limit, opts){
   }
 }
 
-plugin_europe_pmc <- function(sources, query, limit, opts){
+plugin_search_europe_pmc <- function(sources, query, limit, start, opts){
   if (any(grepl("europmc", sources))) {
     opts$query <- query
     out <- do.call(eupmc_search, opts)
@@ -95,7 +100,7 @@ plugin_europe_pmc <- function(sources, query, limit, opts){
   }
 }
 
-plugin_arxiv <- function(sources, query, limit, opts){
+plugin_search_arxiv <- function(sources, query, limit, start, opts){
   if (any(grepl("arxiv", sources))) {
     opts$query <- query
     opts$limit <- limit
@@ -110,7 +115,7 @@ plugin_arxiv <- function(sources, query, limit, opts){
   }
 }
 
-plugin_biorxivr <- function(sources, query, limit, opts){
+plugin_search_biorxivr <- function(sources, query, limit, start, opts){
   if (any(grepl("biorxiv", sources))) {
     opts$query <- query
     opts$limit <- limit
@@ -121,6 +126,44 @@ plugin_biorxivr <- function(sources, query, limit, opts){
     structure(zz, class = "ft_ind", query = query)
   } else {
     zz <- list(source = "biorxiv", found = NULL, data = NULL, opts = opts)
+    structure(zz, class = "ft_ind", query = query)
+  }
+}
+
+plugin_search_scopus <- function(sources, query, limit, start, opts){
+  if (any(grepl("scopus", sources))) {
+    opts$query <- query
+    opts$count <- limit
+    opts$start <- start
+    out <- do.call(scopus_search_loop, opts)
+    #df <- out$`search-results`$entry
+    df <- out$results
+    df$`@_fa` <- df$link <- NULL
+    zz <- list(source = "scopus", 
+               #found = as.numeric(out$`search-results`$`opensearch:totalResults`), 
+               found = out$found,
+               data = df, 
+               opts = opts)
+    structure(zz, class = "ft_ind", query = query)
+  } else {
+    zz <- list(source = "scopus", found = NULL, data = NULL, opts = opts)
+    structure(zz, class = "ft_ind", query = query)
+  }
+}
+
+plugin_search_ma <- function(sources, query, limit, start, opts){
+  if (any(grepl("microsoft", sources))) {
+    opts$query <- query
+    opts$count <- limit
+    opts$offset <- start
+    out <- do.call(microsoft_search, opts)
+    zz <- list(source = "microsoft", 
+               found = NULL,
+               data = out, 
+               opts = opts)
+    structure(zz, class = "ft_ind", query = query)
+  } else {
+    zz <- list(source = "microsoft", found = NULL, data = NULL, opts = opts)
     structure(zz, class = "ft_ind", query = query)
   }
 }

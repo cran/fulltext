@@ -2,22 +2,13 @@
 % Please edit documentation in R/ft_links.R
 \name{ft_links}
 \alias{ft_links}
-\alias{ft_links.character}
-\alias{ft_links.ft}
-\alias{ft_links.ft_ind}
+\alias{ft_links_ls}
 \title{Get full text links}
 \usage{
 ft_links(x, from = NULL, plosopts = list(), crossrefopts = list(),
   entrezopts = list(), bmcopts = list(), ...)
 
-\method{ft_links}{ft}(x, from = NULL, plosopts = list(),
-  crossrefopts = list(), entrezopts = list(), bmcopts = list(), ...)
-
-\method{ft_links}{ft_ind}(x, from = NULL, plosopts = list(),
-  crossrefopts = list(), entrezopts = list(), bmcopts = list(), ...)
-
-\method{ft_links}{character}(x, from = NULL, plosopts = list(),
-  crossrefopts = list(), entrezopts = list(), bmcopts = list(), ...)
+ft_links_ls()
 }
 \arguments{
 \item{x}{One of \code{ft}, \code{ft_ind}, or a character string of DOIs.}
@@ -32,28 +23,35 @@ ft_links(x, from = NULL, plosopts = list(), crossrefopts = list(),
 
 \item{bmcopts}{BMC options. See \code{?bmc_search}}
 
-\item{...}{Further args passed on to \code{\link[httr]{GET}}. Not working right now...}
+\item{...}{ignored right now}
 }
 \value{
-An object of class ft_links, with either a list or data.frame for each 
-DOI, with links for XML and PDF links (typically).
+An object of class ft_links, with either a list or data.frame for
+each DOI, with links for XML and PDF links (typically).
 }
 \description{
 Get full text links
 }
 \details{
-Inputs can be an object of class \code{ft}, \code{ft_ind}, or a 
+Inputs can be an object of class \code{ft}, \code{ft_ind}, or a
 character string of DOIs. You can specify a specific source for four sources
-(PLOS, BMC, Crossref, and Entrez), but any other publishers we guess the 
-publisher form the input DOI(s), then attempt to generate full text links 
+(PLOS, BMC, Crossref, and Entrez), but any other publishers we guess the
+publisher form the input DOI(s), then attempt to generate full text links
 based on the publisher (if found). Of course, guessing the publisher makes
 things slower as it requires an HTTP request.
 
-Strategy varies by publisher. For some we can construct XML and PDF links 
-only from the DOI. For others, we need to make an HTTP request to the 
+Strategy varies by publisher. For some we can construct XML and PDF links
+only from the DOI. For others, we need to make an HTTP request to the
 publisher to get additional information - this of course makes things slower.
+
+See \strong{Rate Limits} and \strong{Authentication} in
+\link{fulltext-package} for rate limiting and authentication information,
+respectively
 }
 \examples{
+# List publishers included
+ft_links_ls()
+
 \dontrun{
 # Entrez
 (res1 <- ft_search(query='ecology', from='entrez'))
@@ -81,13 +79,15 @@ out$crossref$data[[1]]
 (out <- ft_links(res2$crossref))
 out$crossref
 ## from character vector of DOIs
-x <- c("10.1016/s1754-5048(14)00139-1", "10.1016/b978-0-12-378260-1.50017-8")
+x <- c("10.1016/s1754-5048(14)00139-1", 
+       "10.1016/b978-0-12-378260-1.50017-8")
 (out2 <- ft_links(x, from = "crossref"))
 out2$crossref
 
 # PLOS
 (res3 <- ft_search(query='ecology', from='plos', plosopts=list(
-   fl=c('id','author','eissn','journal','counter_total_all','alm_twitterCount'))))
+   fl=c('id','author','eissn','journal','counter_total_all',
+        'alm_twitterCount'))))
 res3$plos$data$id
 ## directly from ft_search output
 (out <- ft_links(res3))
@@ -125,6 +125,14 @@ res$elife
 ft_links('10.7717/peerj.228')
 ft_links(c('10.7717/peerj.228', '10.7717/peerj.1200'))
 
+## wiley
+res <- ft_links('10.1006/asle.2001.0035', from = "crossref")
+res$crossref$data[[1]]$url
+
+## informa
+res <- ft_links('10.1174/02134749660569378', from = "crossref")
+res$crossref$data[[1]]$url
+
 ## frontiersin
 (res <- ft_links('10.3389/fphar.2014.00109'))
 res$frontiersin
@@ -148,4 +156,3 @@ res$elife
 res$peerj
 }
 }
-

@@ -1,16 +1,16 @@
 #' Browse an article in your default browser
 #'
 #' @name ft_browse
-#' @param x An object of class \code{ft_data} - the output from a call to 
-#' \code{\link{ft_get}}
+#' @param x An object of class `ft_data` - the output from a call to 
+#' [ft_get()]
 #' @param what (character) One of macrodocs (default), publisher, or whisker.
 #' @param output A file path, if not given, uses a temporary file, deleted up on leaving the
 #' R session.
-#' @param browse (logical) Whether to browse (default) or not. If \code{FALSE},
+#' @param browse (logical) Whether to browse (default) or not. If `FALSE`,
 #' return the url.
 #'
 #' @details
-#' \code{what=whisker} not operational yet. When operational, will use whisker to open
+#' `what=whisker` not operational yet. When operational, will use whisker to open
 #' html page from XML content, each section parsed into separate section.
 #'
 #' @examples \dontrun{
@@ -22,30 +22,19 @@
 #'
 #' # open to publisher site
 #' ft_browse(x, "publisher")
-#'
-#' # Browse sections
-#' x <- ft_get(c('10.1371/journal.pone.0086169',"10.1371/journal.pone.0110535"), from='plos')
-#' ft_browse_sections(x, "abstract")
-#' ft_browse_sections(x, "categories")
-#'
-#' opts <- list(fq=list('doc_type:full',"article_type:\"research article\""))
-#' out <- ft_search(query='ecology', from='plos', plosopts = opts)$plos$data$id %>%
-#'  ft_get(from = "plos")
-#' out %>% ft_browse_sections("abstract")
-#' out %>% ft_browse_sections("body")
 #' }
 
 #' @export
 #' @rdname ft_browse
 ft_browse <- function(x, what = "macrodocs", browse = TRUE) {
   what <- match.arg(what, c("macrodocs","publisher","whisker"))
-  if (!is(x, "ft_data")) stop("x must be of class ft_data", call. = FALSE)
+  if (!inherits(x, "ft_data")) stop("x must be of class ft_data", call. = FALSE)
   doi <- get_doi(x)
   url <- switch(what,
                 macrodocs = paste0(md(), doi),
                 publisher = paste0(dx(), doi),
                 whisker = stop("not working yet :)", call. = FALSE))
-  if (browse) browseURL(url) else url
+  if (browse) utils::browseURL(url) else url
 }
 
 md <- function() "http://macrodocs.org/?doi="
@@ -69,8 +58,8 @@ ft_browse_sections <- function(x, what = "abstract", output=NULL, browse = TRUE)
   origwhat <- what
   what <- match.arg(what, sections(), FALSE)
   what <- c("doi", what)
-  input <- unname(chunks(x, what)[[1]])
-  input <- lapply(input, function(x) setNames(x, c("doi","target")))
+  input <- unname(ft_chunks(x, what)[[1]])
+  input <- lapply(input, function(x) stats::setNames(x, c("doi","target")))
   for (i in seq_along(input)) {
     input[[i]] <- c(input[[i]], collapse = i)
   }
@@ -81,7 +70,7 @@ ft_browse_sections <- function(x, what = "abstract", output=NULL, browse = TRUE)
   if (is.null(output))
     output <- tempfile(fileext = ".html")
   write(rendered, file = output)
-  if (browse) browseURL(output) else output
+  if (browse) utils::browseURL(output) else output
 }
 
 template <-
