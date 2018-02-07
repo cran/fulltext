@@ -1,12 +1,12 @@
-689e6f0fa6cbd0bff379e0363c841e2b *DESCRIPTION
+22eded3c7928ee013c4c6a87ca0cd47a *DESCRIPTION
 1b96a74f7e95cf508e814ad0c04525e5 *LICENSE
 f760da339b6455f1b4c26c9e2c7f8009 *NAMESPACE
-80dbdedb521015ef9473ef8e150a39ef *NEWS.md
+24a22c68fa6534fa04fa8f994dc17f0b *NEWS.md
 2e43d32eb4377dea034f06d6cc4a7205 *R/bio_utils.R
 e12dca55e859426525ca5ef50b264d08 *R/bmc_utils.R
-9b3fdab28df7723fe9ae3c1c384970ab *R/cache.R
+81008a460411b8963a59e4e53a9d860f *R/cache.R
 4295e9c6ef705af8fb91fe55d38cc319 *R/chunks.R
-0ed8993a69241552c5b895e2a2eba6fe *R/collect.R
+ce20024db154d52267a943a9cb53f747 *R/collect.R
 8dfaa80c2182381676fc6250f19a4309 *R/defunct.R
 b25d1bc90bbc916b3610ed691e3657b0 *R/europe_pmc_utils.R
 0aebb8c998f32a51e5e2b748175e1e2d *R/ft_abstract.R
@@ -39,8 +39,8 @@ c85a3208e209a9ef6f3f74a21552d4e3 *R/plugins_search.R
 6c05459fd0703d2e35ee83ddfe239b39 *R/zzz.R
 1ca856f62710c5511bd5238f257f7619 *README.md
 37c07bef38aa427460d3e786bf00dde7 *build/vignette.rds
-dda89cb7b78c90c7bbe601ce621827d9 *inst/doc/formats.Rmd
-8874f9788dcdc11888c5ac114d00141f *inst/doc/formats.html
+4e24fe73158dc87abbb94e3814d5855d *inst/doc/formats.Rmd
+29cfe536fa6fc604807414ae382569f5 *inst/doc/formats.html
 f0c30a78cc64fa6de05b3b704e68b1b5 *inst/doc/fulltext_vignette.Rmd
 4b3c8ef0bb9ffb5e6ac414b3b888ac6a *inst/doc/fulltext_vignette.html
 3fc5c09a73ce417a563f08d7a47e9f76 *inst/doc/getting_fulltext.Rmd
@@ -74,7 +74,7 @@ be4e784c7c3b7a6e17d5d2209cfa7c2a *man/eupmc.Rd
 15086ddae56bdb5f49f1f9b98ab93773 *man/ft_abstract.Rd
 22b552fef6b64481bc3998e6d71d203c *man/ft_browse.Rd
 c6040508941d9f5a7295909c2c48eacc *man/ft_chunks.Rd
-72a14d28698b78a9cd0e3454fe8d829f *man/ft_collect.Rd
+efa0f25aea3e01196db89876dbcd923e *man/ft_collect.Rd
 4922865fb2de582886e9fb27f184ddcd *man/ft_extract.Rd
 5ada475381d455db7dd39a79cb82cdc1 *man/ft_extract_corpus-defunct.Rd
 344d6b28800bebdfa9b052fc18c5be63 *man/ft_get-warnings.Rd
@@ -108,6 +108,6 @@ c10f441f711f6000eb1ed059b1a69743 *tests/testthat/test-ft_get_si.r
 e12f479bcd5a0587e810ff32dfdcdf78 *tests/testthat/test-ft_providers.R
 af463b83c289691519d0ae5c9d2732bb *tests/testthat/test-ft_search.R
 e9ebe4705295a98f0e40d4d639dd4602 *tests/testthat/test-ft_serialize.R
-dda89cb7b78c90c7bbe601ce621827d9 *vignettes/formats.Rmd
+4e24fe73158dc87abbb94e3814d5855d *vignettes/formats.Rmd
 f0c30a78cc64fa6de05b3b704e68b1b5 *vignettes/fulltext_vignette.Rmd
 3fc5c09a73ce417a563f08d7a47e9f76 *vignettes/getting_fulltext.Rmd
