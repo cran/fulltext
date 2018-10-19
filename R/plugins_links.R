@@ -41,6 +41,7 @@ plugin_links_crossref <- function(sources, ids, opts, ...){
       rbind_fill(lapply(z, function(w) {
         data.frame(url = w[[1]], doi = attr(w, "doi"), type = attr(w, "type"),
                    member = attr(w, "member") %||% "", 
+                   intended_application = attr(w, "intended_application") %||% "",
                    stringsAsFactors = FALSE)
       }))
     })
@@ -66,7 +67,7 @@ bmc_link <- function(dois) {
   xmlbase <- "http://%s/content/download/xml/%s.xml"
   pdfbase <- "http://%s/content/pdf/%s.pdf"
   lapply(dois, function(x) {
-    res <- httr::HEAD(paste0("http://dx.doi.org/", x))
+    res <- httr::HEAD(paste0("https://doi.org/", x))
     url <- httr::parse_url(res$all_headers[[1]]$headers$location)$hostname
     x <- strsplit(x, "/")[[1]][2]
     list(xml = sprintf(xmlbase, url, x), pdf = sprintf(pdfbase, url, x))

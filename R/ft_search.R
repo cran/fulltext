@@ -4,32 +4,42 @@
 #' across many publishers and repositories. We currently support search for 
 #' PLOS via the  \pkg{rplos} package, Crossref via the \pkg{rcrossref} 
 #' package, Entrez via the \pkg{rentrez} package, arXiv via the \pkg{aRxiv} 
-#' package, and BMC, Biorxiv, EueroPMC, and Scopus via internal helper 
+#' package, and BMC, Biorxiv, EuropePMC, and Scopus via internal helper 
 #' functions in this package. 
 #' 
-#' Many publishers content is searchable via Crossref and Entrez - of course 
+#' Many publishers' content is searchable via Crossref and Entrez - of course 
 #' this doesn't mean that we can get full text for those articles. In the 
 #' output objects of this function, we attempt to help by indicating what 
 #' license is used for articles.  
 #'
 #' @export
 #' @param query (character) Query terms
-#' @param from (character) Source to query, one of more of plos, bmc, crossref,
-#' entrez, arxiv, biorxiv, europmc, scopus, or ma
+#' @param from (character) Source to query, one or more of `"plos"`, `"bmc"`, `"crossref"`,
+#' `"entrez"`, `"arxiv"`, `"biorxiv"`, `"europmc"`, `"scopus"`, or `"ma"`
 #' @param limit (integer) Number of records to return. default: 10
 #' @param start (integer) Record number to start at. Only used for 
-#' 'scopus' right now. default: 0
-#' @param plosopts (list) PLOS options. See [rplos::searchplos()]
-#' @param bmcopts (list) BMC options. See [bmc_search()]
-#' @param crossrefopts (list) Crossref options. See [rcrossref::cr_works()]
-#' @param entrezopts (list) Entrez options. See [rentrez::entrez_search()]
-#' @param arxivopts (list) arxiv options. See [aRxiv::arxiv_search()]
-#' @param biorxivopts (list) biorxiv options. See [biorxiv_search()]
-#' @param euroopts (list) Euro PMC options. See [eupmc_search()]
-#' @param scopusopts (list) Scopus options. See [scopus_search()]
-#' @param maopts (list) Microsoft Academic options. See 
+#' 'scopus' right now. default: 0. Note that with some data sources we loop 
+#' internally to get all the results you want with the `limit` parameter, so `start`
+#' in those cases will be ignored. See **Looping** section below.
+#' @param plosopts (list) PLOS options, a named list. See [rplos::searchplos()]
+#' @param bmcopts (list) BMC options, a named list. See [bmc_search()]
+#' @param crossrefopts (list) Crossref options, a named list. 
+#' See [rcrossref::cr_works()]
+#' @param entrezopts (list) Entrez options, a named list. 
+#' See [rentrez::entrez_search()]
+#' @param arxivopts (list) arxiv options, a named list. 
+#' See [aRxiv::arxiv_search()]
+#' @param biorxivopts (list) biorxiv options, a named list. 
+#' See [biorxiv_search()]
+#' @param euroopts (list) Euro PMC options, a named list. See [eupmc_search()]
+#' @param scopusopts (list) Scopus options, a named list. 
+#' See [scopus_search()]
+#' @param maopts (list) Microsoft Academic options, a named list. See 
 #' [microsoft_search()]
 #' @param ... ignored right now
+#' 
+#' @note for all `*opts` parameters, ee the function linked to in 
+#' the parameter definition for what you can pass to it. 
 #' 
 #' @details Each of `plosopts`, `scopusopts`, etc. expect 
 #' a named list.
@@ -37,6 +47,36 @@
 #' @details See **Rate Limits** and **Authentication** in 
 #' [fulltext-package] for rate limiting and authentication information,
 #' respectively
+#' 
+#' See <https://dev.elsevier.com/tips/ScopusSearchTips.htm> for help/tips
+#' on searching with Scopus
+#' 
+#' @section Looping:
+#' Note that we necessarily have to treat different sources/publishers
+#' differently internally in this function. Some we can search and get
+#' back as many results as desired automatically, while with others you'd
+#' have to manually iterate through to get all your results. 
+#' Notes on different sources:
+#' 
+#' - PLOS: [rplos::searchplos()] used and includes internal looping of
+#' requests
+#' - BMC: using internal function `bmc_search` that does not 
+#' loop, so you have to iterate through requests manually
+#' - Crossref: [rcrossref::cr_works()] used, but does not include
+#' internal looping of requests, but the max limit for one request
+#' is relatively high at 1000 
+#' - Entrez: [rentrez::entrez_search()] used, but does not include
+#' internal looping of requests
+#' - arXiv: [aRxiv::arxiv_search()] used and includes internal looping
+#' of requests
+#' - BiorXiv: using internal function `biorxiv_search` that does not
+#' loop, so you have to iterate through requests manually
+#' - Europe BMC: using internal function `eupmc_search` that does not
+#' loop, so you have to iterate through requests manually
+#' - Scopus: using internal function `scopus_search_loop` that does
+#' include internal looping of requests 
+#' - Microsoft AR: using internal function `microsoft_search` that does not
+#' loop, so you have to iterate through requests manually
 #'
 #' @return An object of class `ft`, and objects of class `ft_ind`
 #' within each source. You can access each data source with `$`
@@ -85,13 +125,17 @@
 #' ## pagination
 #' (res <- ft_search(query = 'ecology', from = 'scopus', 
 #'    scopusopts = list(key = Sys.getenv('ELSEVIER_SCOPUS_KEY')), limit = 5))
-#' (res <- ft_search(query = 'ecology', from = 'scopus', 
-#'    scopusopts = list(key = Sys.getenv('ELSEVIER_SCOPUS_KEY')), 
-#'    limit = 5, start = 5))
 #' ## lots of results
 #' (res <- ft_search(query = "ecology community elk cow", from = 'scopus', 
 #'    limit = 100,
 #'    scopusopts = list(key = Sys.getenv('ELSEVIER_SCOPUS_KEY'))))
+#' res$scopus
+#' ## facets
+#' (res <- ft_search(query = 'ecology', from = 'scopus', 
+#'    scopusopts = list(
+#'      key = Sys.getenv('ELSEVIER_SCOPUS_KEY'), 
+#'      facets = "subjarea(count=5)"
+#'    ), limit = 5))
 #' res$scopus
 #'
 #' # PLOS, Crossref, and arxiv

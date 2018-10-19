@@ -23,7 +23,8 @@ make_key <- function(id, type) {
 }
 
 null_list <- function(opts) {
-  list(found = NULL, dois = NULL, data = NULL, opts = opts)
+  list(found = NULL, dois = NULL, data = NULL, opts = opts, 
+    errors = data.frame(NULL))
 }
 
 ft_object <- function(path, id, type) {
@@ -54,7 +55,13 @@ get_ft <- function(x, type, url, path, headers = list(), ...) {
   if (
     inherits(res, c("error", "warning")) ||  ## an error from tryCatch
     res$status_code > 201 || ## HTTP status code indicates an error
-    !grepl(type, res$response_headers[['content-type']]) ## content type does not match
+    !grepl(type, res$response_headers[['content-type']]) || ## content type does not match
+    inherits(
+      tryCatch(
+        switch(type, 
+          xml = xml2::read_xml(res$content), 
+          pdf = pdftools::pdf_info(res$content)), 
+      error=function(e) e), "error") ## invalid file, somehow gave 200 code
   ) {
     unlink(path)
     mssg <- if (inherits(res, c("error", "warning"))) {
@@ -71,7 +78,10 @@ get_ft <- function(x, type, url, path, headers = list(), ...) {
       # if all else fails just give a HTTP status code message back
       http_mssg(res)
     }
-    warning("you may not have access to ", x, " or an error occurred", call. = FALSE)
+    warning("you may not have access to ", x, 
+      "\n or an error occurred", 
+      "\n or the downloaded file was invalid", 
+      call. = FALSE)
     return(ft_error(mssg, x))
   }
   # if success return object
@@ -81,12 +91,15 @@ http_mssg <- function(x) {
   b <- x$status_http()
   sprintf("(%s) %s", b$status_code, b$message)
 }
-# check_cached <- function(x, type, path) {
-#   if (file.exists(path) && !cache_options_get()$overwrite) {
-#     message(paste0("path exists: ", path))
-#     return(ft_object(path, x, type))
-#   }   
-# }
+
+# x = dat
+error_df <- function(x) {
+  tmp <- lapply(x$path, "[[", "error")
+  data.frame(
+    id = names(tmp), 
+    error = unlist(Map(function(z) if (is.null(z)) NA_character_ else z, unname(tmp))), 
+    stringsAsFactors = FALSE)
+}
 
 ## plugin generator
 plugin_get_generator <- function(srce, fun) {
@@ -96,6 +109,7 @@ plugin_get_generator <- function(srce, fun) {
     }
     
     # do request
+    ids <- stats::na.omit(ids)
     callopts <- list(...)
     if (any(grepl(eval(srce), sources))) {
       if (!any(grepl("arxiv", sources))) check_dois(ids)
@@ -113,18 +127,15 @@ plugin_get_generator <- function(srce, fun) {
       out <- do.call(fun, opts)
       
       # deals with case where no results
-      if (length(out) == 0) {
-        return(list(found = NULL, dois = NULL, data = NULL, opts = opts))
-      }
+      if (length(out) == 0) return(null_list(opts))
 
-      #attr(out, "format") <- type
       dat <- if (any(sources %in% c("arxiv", "biorxiv"))) {
         pprint_cache(out)
       } else {
         construct_paths(cache_options_get(), out, type)
       }
       list(found = length(ft_compact(lapply(out, "[[", "path"))), dois = names(out), 
-        data = dat, opts = opts)
+        data = dat, opts = opts, errors = error_df(dat))
     } else {
       null_list(opts)
     }
@@ -154,6 +165,12 @@ plugin_get_royalsocchem <- plugin_get_generator("royalsocchem", roysocchem_ft)
 plugin_get_ieee <- plugin_get_generator("ieee", ieee_ft)
 plugin_get_aaas <- plugin_get_generator("aaas", aaas_ft)
 plugin_get_pnas <- plugin_get_generator("pnas", pnas_ft)
+plugin_get_microbiology <- plugin_get_generator("microbiology", microbiology_ft)
+plugin_get_jama <- plugin_get_generator("jama", jama_ft)
+plugin_get_amersocmicrobiol <- plugin_get_generator("amersocmicrobiol", amersocmicrobiol_ft)
+plugin_get_amersocclinoncol <- plugin_get_generator("amersocclinoncol", amersocclinoncol_ft)
+plugin_get_instinvestfil <- plugin_get_generator("instinvestfil", instinvestfil_ft)
+plugin_get_aip <- plugin_get_generator("aip", aip_ft)
 
 
 ## getters - could stand to make closure for the below as well, FIXME
@@ -181,17 +198,46 @@ plos_wrapper <- function(dois, type, ...) {
 
 # Entrez - wrapper around rentrez::entrez_search/rentrez::entrez_fetch
 # type: only xml
-entrez_ft <- function(ids, type = "xml", ...){
+entrez_ft <- function(ids, type = "xml", ...) {
+  ids <- stats::na.omit(ids)
   db <- "pmc"
-  res <- rentrez::entrez_search(db = "pmc",
-                                term = paste0(sprintf('%s[doi]', ids),
-                                              collapse = "|"))
+  if (length(ids) > 50) {
+    chunk_size <- 50
+    ids_chunked <- split(ids, ceiling(seq_along(ids)/chunk_size))
+    out <- list()
+    for (i in seq_along(ids_chunked)) {
+      out[[i]] <- rentrez::entrez_search(
+        db = db,
+        term = paste0(sprintf('%s[doi]', ids_chunked[[i]]), collapse = "|")
+      )
+    }
+    res <- list(ids = unlist(lapply(out, function(z) z$ids)))
+  } else {
+    res <- rentrez::entrez_search(
+      db = db,
+      term = paste0(sprintf('%s[doi]', ids), collapse = "|")
+    )
+  }
   
   if (length(res$ids) == 0) {
     db <- 'pubmed'
-    res <- rentrez::entrez_search(db = "pubmed",
-                                  term = paste0(sprintf('%s[doi]', ids),
-                                                collapse = "|"))
+    if (length(ids) > 50) {
+      chunk_size <- 50
+      ids_chunked <- split(ids, ceiling(seq_along(ids)/chunk_size))
+      out <- list()
+      for (i in seq_along(ids_chunked)) {
+        out[[i]] <- rentrez::entrez_search(
+          db = db,
+          term = paste0(sprintf('%s[doi]', ids_chunked[[i]]), collapse = "|")
+        )
+      }
+      res <- list(ids = unlist(lapply(out, function(z) z$ids)))
+    } else {
+      res <- rentrez::entrez_search(
+        db = db,
+        term = paste0(sprintf('%s[doi]', ids), collapse = "|")
+      )
+    }
   }
 
   if (length(res$ids) == 0) return(NULL)
@@ -205,7 +251,7 @@ entrez_ft <- function(ids, type = "xml", ...){
     invisible(rentrez::entrez_fetch(db = db, id = z, 
       rettype = "xml", config = httr::write_disk(path, cache_options_get()$overwrite)))
     ft_object(path, z, 'xml')
-  }), ids)
+  }), res$ids)
 }
 
 # type: xml only presumably
@@ -507,6 +553,113 @@ pnas_ft <- function(dois, type = "pdf", ...) {
     get_ft(x = x, type = 'pdf', url = url, path = path, ...)
   }), dois)
 }
+
+# type: only pdf (type parameter is ignored)
+microbiology_ft <- function(dois, type = "pdf", ...) {
+  stats::setNames(lapply(dois, function(x) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+
+    lk <- tcat(ftdoi_get(sprintf("api/doi/%s/", x)))
+    if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
+    urls <- jsonlite::fromJSON(lk$parse("UTF-8"))$links
+    url <- urls[grep("pdf", urls$`content-type`), "url"]
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }), dois)
+}
+
+# type: only pdf (type parameter is ignored)
+jama_ft <- function(dois, type = "pdf", ...) {
+  stats::setNames(lapply(dois, function(x) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+
+    lk <- tcat(ftdoi_get(sprintf("api/doi/%s/", x)))
+    if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
+    urls <- jsonlite::fromJSON(lk$parse("UTF-8"))$links
+    url <- urls[grep("pdf", urls$`content-type`), "url"]
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }), dois)
+}
+
+# type: only pdf (type parameter is ignored)
+amersocmicrobiol_ft <- function(dois, type = "pdf", ...) {
+  stats::setNames(lapply(dois, function(x) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+
+    lk <- tcat(ftdoi_get(sprintf("api/doi/%s/", x)))
+    if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
+    urls <- jsonlite::fromJSON(lk$parse("UTF-8"))$links
+    url <- urls[grep("pdf", urls$`content-type`), "url"]
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }), dois)
+}
+
+# type: only pdf (type parameter is ignored)
+amersocclinoncol_ft <- function(dois, type = "pdf", ...) {
+  stats::setNames(lapply(dois, function(x) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+
+    lk <- tcat(ftdoi_get(sprintf("api/doi/%s/", x)))
+    if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
+    urls <- jsonlite::fromJSON(lk$parse("UTF-8"))$links
+    url <- urls[grep("pdf", urls$`content-type`), "url"]
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }), dois)
+}
+
+# type: only pdf (type parameter is ignored)
+instinvestfil_ft <- function(dois, type = "pdf", ...) {
+  stats::setNames(lapply(dois, function(x) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+
+    lk <- tryCatch(crminer::crm_links(x), error = function(e) e, warning = function(w) w)
+    if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
+    if (is.null(lk) || length(lk) == 0) {
+      mssg <- "has no link available"
+      warning(x, " ", mssg, call. = FALSE)
+      return(ft_error(mssg, x))
+    }
+    url = sub('view', 'download', lk[[1]][[1]])
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }), dois)
+}
+
+# type: only pdf (type parameter is ignored)
+aip_ft <- function(dois, type = "pdf", ...) {
+  stats::setNames(lapply(dois, function(x) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+
+    lk <- tcat(ftdoi_get(sprintf("api/doi/%s/", x)))
+    if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
+    urls <- jsonlite::fromJSON(lk$parse("UTF-8"))$links
+    url <- urls[grep("pdf", urls$`content-type`), "url"]
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }), dois)
+}
+
 
 # special Crossref plugin to try any DOI
 crossref_ft <- function(dois, type, ...) {

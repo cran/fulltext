@@ -95,8 +95,21 @@
 #' To pass your email address to Crossref via this client, store it 
 #' as an environment variable in `.Renviron` like `crossref_email = name@example.com`
 #' 
-#' None needed for **PLOS**, **eLife**, **arxiv**, **biorxiv**, **Euro PMC**, or 
-#' **Entrez** (though soon you will get better rate limtits with auth for Entrez)
+#' **Entrez**: NCBI limits users to making only 3 requests per second. But, users 
+#' who register for an API key are able to make up to ten requests per second. 
+#' Getting a key is simple; register for a "my ncbi" account then click on a 
+#' button in the account settings page. Once you have an API key, you can pass it 
+#' as the argument `api_key` to `entrezopts` in both [ft_get()] and [ft_search()]. 
+#' However, we advise you use environment variables instead as they are more secure.
+#' To do that you can set an environment variable for the current R session like 
+#' `Sys.setenv(ENTREZ_KEY="yourkey")` OR better yet set it in your `.Renviron` 
+#' or equivalent file with an entry like `ENTREZ_KEY=yourkey` so that it is 
+#' used across R sessions.
+#' 
+#' No authentication needed for **PLOS**, **eLife**, **arxiv**, **biorxiv**, 
+#' **Euro PMC**
+#' 
+#' Let us know if you run into trouble with authentication.
 #'
 #' @section Feedback:
 #' Let us know what you think at <https://github.com/ropensci/fulltext/issues>
@@ -106,7 +119,6 @@
 #' @importFrom crul HttpClient
 #' @importFrom httr HEAD GET POST upload_file content_type content write_disk
 #' stop_for_status
-#' @importFrom whisker whisker.render
 #' @importFrom rentrez entrez_search entrez_fetch entrez_link entrez_summary
 #' @importFrom rplos searchplos plos_fulltext
 #' @importFrom rcrossref cr_works cr_ft_links
@@ -114,6 +126,8 @@
 #' @importFrom microdemic ma_abstract ma_evaluate
 #' @importFrom storr storr_rds
 #' @importFrom tibble as_tibble
+#' @importFrom stats na.omit
+#' @importFrom digest digest
 #' @name fulltext-package
 #' @aliases fulltext
 #' @docType package

@@ -3,7 +3,7 @@
 \name{ft_get}
 \alias{ft_get}
 \alias{ft_get_ls}
-\title{Get full text}
+\title{Download full text articles}
 \usage{
 ft_get(x, from = NULL, type = "xml", try_unknown = TRUE,
   plosopts = list(), bmcopts = list(), entrezopts = list(),
@@ -75,6 +75,7 @@ retrived this is \code{NULL}
 but until then this is \code{NULL}
 }
 \item \code{opts}: the options given like article type, dois
+\item \code{errors}: data.frame of errors, with two columns for article id and error
 }
 }
 \description{
@@ -82,8 +83,8 @@ but until then this is \code{NULL}
 either XML or PDFs. We have specific support for PLOS via the
 \pkg{rplos} package, Entrez via the \pkg{rentrez} package, and arXiv via the
 \pkg{aRxiv} package. For other publishers, we have helpers to \code{ft_get} to
-sort out links for full text based on user input. See \code{Details} for
-help on how to use this function.
+sort out links for full text based on user input. Articles are saved on
+disk. See \code{Details} for help on how to use this function.
 }
 \details{
 There are various ways to use \code{ft_get}:
@@ -194,6 +195,11 @@ ft_get_ls()
 ## PLOS
 ft_get('10.1371/journal.pone.0086169')
 
+# Collect all errors from across papers
+#   similarly can combine from different publishers as well
+res <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.aaaa'), from = "elife")
+res$elife$errors
+
 ## PeerJ
 ft_get('10.7717/peerj.228')
 ft_get('10.7717/peerj.228', type = "pdf")
@@ -209,13 +215,13 @@ respdf$elife
 
 elife_xml <- ft_get('10.7554/eLife.03032', from = "elife")
 library(magrittr)
-elife_xml \%<>\% collect()
+elife_xml \%<>\% ft_collect()
 elife_xml$elife
 ### pdf
 elife_pdf <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'), 
   from = "elife", type = "pdf")
 elife_pdf$elife
-elife_pdf \%<>\% collect()
+elife_pdf \%<>\% ft_collect()
 elife_pdf \%>\% ft_extract()
 
 ## some BMC DOIs will work, but some may not, who knows
@@ -232,7 +238,7 @@ res
 res$hindawi
 res$hindawi$data$path
 res$hindawi$data$data
-res \%>\% collect() \%>\% .$hindawi
+res \%>\% ft_collect() \%>\% .$hindawi
 
 ## F1000Research - via Entrez
 x <- ft_get('10.12688/f1000research.6522.1')
@@ -243,8 +249,6 @@ res$f1000research
 
 ## Pensoft
 ft_get('10.3897/mycokeys.22.12528')
-### you'll need to specify the publisher for a DOI from a recent publication
-ft_get('10.3897/zookeys.515.9332', from = "pensoft")
 
 ## Copernicus
 out <- ft_get(c('10.5194/angeo-31-2157-2013', '10.5194/bg-12-4577-2015'))
@@ -272,6 +276,7 @@ ft_get(c('10.3390/nu3010063', '10.3390/nu7085279')) # not working, only getting 
 # Scientific Societies
 ## this is a paywall article, you may not have access or you may
 x <- ft_get("10.1094/PHYTO-04-17-0144-R")
+x$scientificsocieties
 
 # Informa
 x <- ft_get("10.1080/03088839.2014.926032")
@@ -337,6 +342,18 @@ ft_get('10.1063/1.4967823', try_unknown = TRUE)
 # PNAS
 ft_get('10.1073/pnas.1708584115', try_unknown = TRUE)
 
+# American Society for Microbiology
+ft_get('10.1128/cvi.00178-17')
+
+# American Society of Clinical Oncology
+ft_get('10.1200/JCO.18.00454')
+
+# American Institute of Physics
+ft_get('10.1063/1.4895527')
+
+# American Chemical Society
+ft_get(c('10.1021/la903074z', '10.1021/jp048806z'))
+
 
 # From ft_links output
 ## Crossref
@@ -359,12 +376,12 @@ ress$plos$data
 ress$plos$data$path$`10.1371/journal.pone.0059813`
 
 ## No publisher plugin provided yet
-# ft_get('10.1037/10740-005')
-### but no link available for this DOI
-res <- ft_get('10.1037/10740-005', try_unknown = TRUE)
-res$crossref
-### a link IS available for this DOI
+ft_get('10.1037/10740-005')
+### no link available for this DOI
 res <- ft_get('10.1037/10740-005', try_unknown = TRUE)
 res$crossref
 }
+}
+\seealso{
+\code{\link[=as.ft_data]{as.ft_data()}}
 }

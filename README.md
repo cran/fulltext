@@ -9,9 +9,10 @@ _/ ____\_ __|  | |  |_/  |_  ____ ___  ____/  |_
                                 \/      \/
 ```
 
+[![cran checks](https://cranchecks.info/badges/worst/fulltext)](https://cranchecks.info/pkgs/fulltext)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Build Status](https://api.travis-ci.org/ropensci/fulltext.svg)](https://travis-ci.org/ropensci/fulltext)
-[![Build status](https://ci.appveyor.com/api/projects/status/y487h3ec5wc2s20m/branch/master?svg=true)](https://ci.appveyor.com/project/sckott/fulltext/branch/master)
+<!-- [![Build status](https://ci.appveyor.com/api/projects/status/y487h3ec5wc2s20m/branch/master?svg=true)](https://ci.appveyor.com/project/sckott/fulltext/branch/master) -->
 [![codecov.io](https://codecov.io/github/ropensci/fulltext/coverage.svg?branch=master)](https://codecov.io/github/ropensci/fulltext?branch=master)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/fulltext)](https://github.com/metacran/cranlogs.app)
 [![cran version](http://www.r-pkg.org/badges/version/fulltext)](https://cran.r-project.org/package=fulltext)
@@ -50,14 +51,18 @@ Data sources in `fulltext` include:
 available via Pubmed)
 * We __will__ add more, as publishers open up, and as we have time...See the [master list here](https://github.com/ropensci/fulltext/issues/4#issuecomment-52376743)
 
-Authorization: A number of publishers require authorization via API key, and some even more
-draconian authorization processes involving checking IP addresses. We are working on supporting
-all the various authorization things for different publishers, but of course all the OA content
+Authentication: A number of publishers require authentication via API key, and some even more
+draconian authentication processes involving checking IP addresses. We are working on supporting
+all the various authentication things for different publishers, but of course all the OA content
 is already easily available.
 
 We'd love your feedback. Let us know what you think in [the issue tracker](https://github.com/ropensci/fulltext/issues)
 
 Article full text formats by publisher:  [https://github.com/ropensci/fulltext/blob/master/vignettes/formats.Rmd](https://github.com/ropensci/fulltext/blob/master/vignettes/formats.Rmd)
+
+_Important Note_: Supplementary data from papers is being moved to the [suppdata][] package.
+Once `suppdata` is on CRAN, we'll deprecate the `ft_get_si` function here; after which point `suppdata` focuses on supplementary materials and `fulltext` focuses on the papers themselves.
+
 
 ## Installation
 
@@ -92,7 +97,7 @@ ft_search(query = 'ecology', from = 'crossref')
 #> Query:
 #>   [ecology] 
 #> Found:
-#>   [PLoS: 0; BMC: 0; Crossref: 144283; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
+#>   [PLoS: 0; BMC: 0; Crossref: 155437; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
 #> Returned:
 #>   [PLoS: 0; BMC: 0; Crossref: 10; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]
 ```
@@ -106,8 +111,8 @@ ft_search(query = 'ecology', from = 'crossref')
 res1 <- ft_search(query = 'ecology', from = 'entrez', limit = 5)
 ft_links(res1)
 #> <fulltext links>
-#> [Found] 5 
-#> [IDs] ID_29321529 ID_29321528 ID_29321519 ID_29321473 ID_29319501 ...
+#> [Found] 1 
+#> [IDs] ID_29429126 ...
 ```
 
 Or pass in DOIs directly
@@ -116,8 +121,8 @@ Or pass in DOIs directly
 ```r
 ft_links(res1$entrez$data$doi, from = "entrez")
 #> <fulltext links>
-#> [Found] 5 
-#> [IDs] ID_29321529 ID_29321528 ID_29321519 ID_29321473 ID_29319501 ...
+#> [Found] 1 
+#> [IDs] ID_29429126 ...
 ```
 
 ## Get full text
@@ -211,7 +216,7 @@ pdf <- system.file("examples", "example2.pdf", package = "fulltext")
 
 ```r
 ft_extract(pdf)
-#> <document>/Library/Frameworks/R.framework/Versions/3.4/Resources/library/fulltext/examples/example2.pdf
+#> <document>/Library/Frameworks/R.framework/Versions/3.5/Resources/library/fulltext/examples/example2.pdf
 #>   Title: pone.0107412 1..10
 #>   Producer: Acrobat Distiller 9.0.0 (Windows); modified using iText 5.0.3 (c) 1T3XT BVBA
 #>   Creation date: 2014-09-18
@@ -231,13 +236,14 @@ x <- readtext::readtext(file.path(cache_options_get()$path, "*.pdf"))
 ```r
 library(quanteda)
 quanteda::corpus(x)
-#> Corpus consisting of 2 documents and 1 docvar.
+#> Corpus consisting of 2 documents and 0 docvars.
 ```
 
 ## Contributors
 
 * Scott Chamberlain <http://github.com/sckott>
 * Will Pearse <https://github.com/willpearse>
+* Katrin Leinweber <https://github.com/katrinleinweber>
 
 ## Meta
 
@@ -247,3 +253,5 @@ quanteda::corpus(x)
 * Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 [![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
+
+[suppdata]: https://github.com/ropensci/suppdata

@@ -1,11 +1,11 @@
-#' @title Get full text
+#' @title Download full text articles
 #'
 #' @description `ft_get` is a one stop shop to fetch full text of articles,
 #' either XML or PDFs. We have specific support for PLOS via the
 #' \pkg{rplos} package, Entrez via the \pkg{rentrez} package, and arXiv via the
 #' \pkg{aRxiv} package. For other publishers, we have helpers to `ft_get` to
-#' sort out links for full text based on user input. See `Details` for
-#' help on how to use this function.
+#' sort out links for full text based on user input. Articles are saved on 
+#' disk. See `Details` for help on how to use this function.
 #'
 #' @export
 #'
@@ -31,6 +31,8 @@
 #' @param crossrefopts Crossref options
 #' @param wileyopts Wiley options
 #' @param ... Further args passed on to [crul::HttpClient]
+#' 
+#' @seealso [as.ft_data()]
 #'
 #' @return An object of class `ft_data` (of type `S3`) with slots for
 #' each of the publishers. The returned object is split up by publishers because
@@ -60,6 +62,7 @@
 #'     - `data`: if text extracted (see [ft_collect()]) the text will be here, 
 #'       but until then this is `NULL`
 #' - `opts`: the options given like article type, dois
+#' - `errors`: data.frame of errors, with two columns for article id and error
 #'
 #' @details There are various ways to use `ft_get`:
 #' \itemize{
@@ -153,6 +156,11 @@
 #' ## PLOS
 #' ft_get('10.1371/journal.pone.0086169')
 #' 
+#' # Collect all errors from across papers
+#' #   similarly can combine from different publishers as well
+#' res <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.aaaa'), from = "elife")
+#' res$elife$errors
+#' 
 #' ## PeerJ
 #' ft_get('10.7717/peerj.228')
 #' ft_get('10.7717/peerj.228', type = "pdf")
@@ -168,13 +176,13 @@
 #' 
 #' elife_xml <- ft_get('10.7554/eLife.03032', from = "elife")
 #' library(magrittr)
-#' elife_xml %<>% collect()
+#' elife_xml %<>% ft_collect()
 #' elife_xml$elife
 #' ### pdf
 #' elife_pdf <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'), 
 #'   from = "elife", type = "pdf")
 #' elife_pdf$elife
-#' elife_pdf %<>% collect()
+#' elife_pdf %<>% ft_collect()
 #' elife_pdf %>% ft_extract()
 #' 
 #' ## some BMC DOIs will work, but some may not, who knows
@@ -191,7 +199,7 @@
 #' res$hindawi
 #' res$hindawi$data$path
 #' res$hindawi$data$data
-#' res %>% collect() %>% .$hindawi
+#' res %>% ft_collect() %>% .$hindawi
 #' 
 #' ## F1000Research - via Entrez
 #' x <- ft_get('10.12688/f1000research.6522.1')
@@ -202,8 +210,6 @@
 #' 
 #' ## Pensoft
 #' ft_get('10.3897/mycokeys.22.12528')
-#' ### you'll need to specify the publisher for a DOI from a recent publication
-#' ft_get('10.3897/zookeys.515.9332', from = "pensoft")
 #' 
 #' ## Copernicus
 #' out <- ft_get(c('10.5194/angeo-31-2157-2013', '10.5194/bg-12-4577-2015'))
@@ -231,6 +237,7 @@
 #' # Scientific Societies
 #' ## this is a paywall article, you may not have access or you may
 #' x <- ft_get("10.1094/PHYTO-04-17-0144-R")
+#' x$scientificsocieties
 #' 
 #' # Informa
 #' x <- ft_get("10.1080/03088839.2014.926032")
@@ -295,6 +302,18 @@
 #' 
 #' # PNAS
 #' ft_get('10.1073/pnas.1708584115', try_unknown = TRUE)
+#' 
+#' # American Society for Microbiology
+#' ft_get('10.1128/cvi.00178-17')
+#' 
+#' # American Society of Clinical Oncology
+#' ft_get('10.1200/JCO.18.00454')
+#' 
+#' # American Institute of Physics
+#' ft_get('10.1063/1.4895527')
+#' 
+#' # American Chemical Society
+#' ft_get(c('10.1021/la903074z', '10.1021/jp048806z'))
 #'
 #' 
 #' # From ft_links output
@@ -318,11 +337,8 @@
 #' ress$plos$data$path$`10.1371/journal.pone.0059813`
 #' 
 #' ## No publisher plugin provided yet
-#' # ft_get('10.1037/10740-005')
-#' ### but no link available for this DOI
-#' res <- ft_get('10.1037/10740-005', try_unknown = TRUE)
-#' res$crossref
-#' ### a link IS available for this DOI
+#' ft_get('10.1037/10740-005')
+#' ### no link available for this DOI
 #' res <- ft_get('10.1037/10740-005', try_unknown = TRUE)
 #' res$crossref
 #' }
@@ -496,6 +512,7 @@ get_unknown <- function(x, type, try_unknown, ...) {
   df <- data.frame(pub = unlist(unname(pubs)), doi = names(pubs), 
     name = vapply(pubs, attr, '', 'publisher', USE.NAMES=FALSE),
     issn = vapply(pubs, attr, '', 'issn', USE.NAMES=FALSE),
+    error = vapply(pubs, attr, '', 'error', USE.NAMES=FALSE),
     stringsAsFactors = FALSE)
   dfsplit <- split(df, df$pub)
   out <- list()
@@ -537,8 +554,8 @@ get_unknown <- function(x, type, try_unknown, ...) {
         } else {
           fun <- plugin_get_crossref
           tm_nm <- 'crossref'
-          warning("no plugin for Crossref member ", names(dfsplit)[i], 
-            " yet", call. = FALSE)
+          warning("no plugin for Crossref member '", names(dfsplit)[i], 
+            "' yet", call. = FALSE)
         }
 
         pub_nm <- dfsplit[[i]]$name[1]
@@ -586,7 +603,13 @@ publisher_plugin <- function(x) {
     `292` = plugin_get_royalsocchem,
     `263` = plugin_get_ieee,
     `221` = plugin_get_aaas,
-    `341` = plugin_get_pnas
+    `341` = plugin_get_pnas,
+    `345` = plugin_get_microbiology,
+    `10` = plugin_get_jama,
+    `235` = plugin_get_amersocmicrobiol,
+    `233` = plugin_get_amersocclinoncol,
+    `8215` = plugin_get_instinvestfil,
+    `317` = plugin_get_aip
   )
 }
 
@@ -613,6 +636,12 @@ get_pub_name <- function(x) {
          `263` = "ieee",
          `221` = "aaas",
          `341` = "pnas",
+         `345` = "microbiology",
+         `10` = "jama",
+         `235` = "amersocmicrobiol",
+         `233` = "amersocclinoncol",
+         `8215` = "instinvestfil",
+         `317` = "aip",
          "crossref"
   )
 }
@@ -640,24 +669,41 @@ get_tm_name <- function(x) {
          `263` = "ieee",
          `221` = "aaas",
          `341` = "pnas",
+         `345` = "microbiology",
+         `10` = "jama",
+         `235` = "amersocmicrobiol",
+         `233` = "amersocclinoncol",
+         `8215` = "instinvestfil",
+         `317` = "aip",
          "crossref"
   )
 }
 
 get_publisher <- function(x) {
-  z <- rcrossref::cr_works(x)
+  z <- tryCatch(rcrossref::cr_works(x), warning = function(w) w)
   # FIXME: at some point replace this with 
   #   mapping of Crossref member number to a unique short name
+  if (inherits(z, "warning")) return(unknown_id(z$message))
   pub <- gsub("/|\\.|-|:|;|\\(|\\)|<|>|\\s", "_",  tolower(z$data$publisher))
-  issn <- z$data$ISSN
+  names(z$data) <- tolower(names(z$data))
+  issn <- z$data$issn
   if (length(z) == 0) {
-    NULL
+    return(unknown_id())
   } else {
     id <- as.character(strextract(z$data$member, "[0-9]+"))
     attr(id, "publisher") <- pub %||% ""
     attr(id, "issn") <- issn %||% ""
+    attr(id, "error") <- ""
     return(id)
   }
+}
+
+unknown_id <- function(mssg) {
+  id <- "unknown"
+  attr(id, "publisher") <- "unknown"
+  attr(id, "issn") <- "unknown"
+  attr(id, "error") <- mssg
+  return(id)
 }
 
 check_type <- function(x) {

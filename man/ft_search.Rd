@@ -15,31 +15,38 @@ ft_search_ls()
 \arguments{
 \item{query}{(character) Query terms}
 
-\item{from}{(character) Source to query, one of more of plos, bmc, crossref,
-entrez, arxiv, biorxiv, europmc, scopus, or ma}
+\item{from}{(character) Source to query, one or more of \code{"plos"}, \code{"bmc"}, \code{"crossref"},
+\code{"entrez"}, \code{"arxiv"}, \code{"biorxiv"}, \code{"europmc"}, \code{"scopus"}, or \code{"ma"}}
 
 \item{limit}{(integer) Number of records to return. default: 10}
 
 \item{start}{(integer) Record number to start at. Only used for
-'scopus' right now. default: 0}
+'scopus' right now. default: 0. Note that with some data sources we loop
+internally to get all the results you want with the \code{limit} parameter, so \code{start}
+in those cases will be ignored. See \strong{Looping} section below.}
 
-\item{plosopts}{(list) PLOS options. See \code{\link[rplos:searchplos]{rplos::searchplos()}}}
+\item{plosopts}{(list) PLOS options, a named list. See \code{\link[rplos:searchplos]{rplos::searchplos()}}}
 
-\item{bmcopts}{(list) BMC options. See \code{\link[=bmc_search]{bmc_search()}}}
+\item{bmcopts}{(list) BMC options, a named list. See \code{\link[=bmc_search]{bmc_search()}}}
 
-\item{crossrefopts}{(list) Crossref options. See \code{\link[rcrossref:cr_works]{rcrossref::cr_works()}}}
+\item{crossrefopts}{(list) Crossref options, a named list.
+See \code{\link[rcrossref:cr_works]{rcrossref::cr_works()}}}
 
-\item{entrezopts}{(list) Entrez options. See \code{\link[rentrez:entrez_search]{rentrez::entrez_search()}}}
+\item{entrezopts}{(list) Entrez options, a named list.
+See \code{\link[rentrez:entrez_search]{rentrez::entrez_search()}}}
 
-\item{arxivopts}{(list) arxiv options. See \code{\link[aRxiv:arxiv_search]{aRxiv::arxiv_search()}}}
+\item{arxivopts}{(list) arxiv options, a named list.
+See \code{\link[aRxiv:arxiv_search]{aRxiv::arxiv_search()}}}
 
-\item{biorxivopts}{(list) biorxiv options. See \code{\link[=biorxiv_search]{biorxiv_search()}}}
+\item{biorxivopts}{(list) biorxiv options, a named list.
+See \code{\link[=biorxiv_search]{biorxiv_search()}}}
 
-\item{euroopts}{(list) Euro PMC options. See \code{\link[=eupmc_search]{eupmc_search()}}}
+\item{euroopts}{(list) Euro PMC options, a named list. See \code{\link[=eupmc_search]{eupmc_search()}}}
 
-\item{scopusopts}{(list) Scopus options. See \code{\link[=scopus_search]{scopus_search()}}}
+\item{scopusopts}{(list) Scopus options, a named list.
+See \code{\link[=scopus_search]{scopus_search()}}}
 
-\item{maopts}{(list) Microsoft Academic options. See
+\item{maopts}{(list) Microsoft Academic options, a named list. See
 \code{\link[=microsoft_search]{microsoft_search()}}}
 
 \item{...}{ignored right now}
@@ -53,10 +60,10 @@ within each source. You can access each data source with \code{$}
 across many publishers and repositories. We currently support search for
 PLOS via the  \pkg{rplos} package, Crossref via the \pkg{rcrossref}
 package, Entrez via the \pkg{rentrez} package, arXiv via the \pkg{aRxiv}
-package, and BMC, Biorxiv, EueroPMC, and Scopus via internal helper
+package, and BMC, Biorxiv, EuropePMC, and Scopus via internal helper
 functions in this package.
 
-Many publishers content is searchable via Crossref and Entrez - of course
+Many publishers' content is searchable via Crossref and Entrez - of course
 this doesn't mean that we can get full text for those articles. In the
 output objects of this function, we attempt to help by indicating what
 license is used for articles.
@@ -68,7 +75,44 @@ a named list.
 See \strong{Rate Limits} and \strong{Authentication} in
 \link{fulltext-package} for rate limiting and authentication information,
 respectively
+
+See \url{https://dev.elsevier.com/tips/ScopusSearchTips.htm} for help/tips
+on searching with Scopus
 }
+\note{
+for all \code{*opts} parameters, ee the function linked to in
+the parameter definition for what you can pass to it.
+}
+\section{Looping}{
+
+Note that we necessarily have to treat different sources/publishers
+differently internally in this function. Some we can search and get
+back as many results as desired automatically, while with others you'd
+have to manually iterate through to get all your results.
+Notes on different sources:
+\itemize{
+\item PLOS: \code{\link[rplos:searchplos]{rplos::searchplos()}} used and includes internal looping of
+requests
+\item BMC: using internal function \code{bmc_search} that does not
+loop, so you have to iterate through requests manually
+\item Crossref: \code{\link[rcrossref:cr_works]{rcrossref::cr_works()}} used, but does not include
+internal looping of requests, but the max limit for one request
+is relatively high at 1000
+\item Entrez: \code{\link[rentrez:entrez_search]{rentrez::entrez_search()}} used, but does not include
+internal looping of requests
+\item arXiv: \code{\link[aRxiv:arxiv_search]{aRxiv::arxiv_search()}} used and includes internal looping
+of requests
+\item BiorXiv: using internal function \code{biorxiv_search} that does not
+loop, so you have to iterate through requests manually
+\item Europe BMC: using internal function \code{eupmc_search} that does not
+loop, so you have to iterate through requests manually
+\item Scopus: using internal function \code{scopus_search_loop} that does
+include internal looping of requests
+\item Microsoft AR: using internal function \code{microsoft_search} that does not
+loop, so you have to iterate through requests manually
+}
+}
+
 \examples{
 # List publishers included
 ft_search_ls()
@@ -113,13 +157,17 @@ res$scopus
 ## pagination
 (res <- ft_search(query = 'ecology', from = 'scopus', 
    scopusopts = list(key = Sys.getenv('ELSEVIER_SCOPUS_KEY')), limit = 5))
-(res <- ft_search(query = 'ecology', from = 'scopus', 
-   scopusopts = list(key = Sys.getenv('ELSEVIER_SCOPUS_KEY')), 
-   limit = 5, start = 5))
 ## lots of results
 (res <- ft_search(query = "ecology community elk cow", from = 'scopus', 
    limit = 100,
    scopusopts = list(key = Sys.getenv('ELSEVIER_SCOPUS_KEY'))))
+res$scopus
+## facets
+(res <- ft_search(query = 'ecology', from = 'scopus', 
+   scopusopts = list(
+     key = Sys.getenv('ELSEVIER_SCOPUS_KEY'), 
+     facets = "subjarea(count=5)"
+   ), limit = 5))
 res$scopus
 
 # PLOS, Crossref, and arxiv

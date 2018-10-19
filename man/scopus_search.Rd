@@ -2,10 +2,17 @@
 % Please edit documentation in R/scopus_utils.R
 \name{scopus_search}
 \alias{scopus_search}
+\alias{scopus_search_loop}
 \title{Scopus search}
 \usage{
 scopus_search(query = NULL, count = 25, start = 0, type = "search",
-  search_type = "scopus", key = NULL, ...)
+  search_type = "scopus", facets = NULL, view = NULL, date = NULL,
+  sort = NULL, content = NULL, subj = NULL, key = NULL, ...)
+
+scopus_search_loop(query = NULL, count = 25, start = 0,
+  type = "search", search_type = "scopus", facets = NULL,
+  view = NULL, date = NULL, sort = NULL, content = NULL,
+  subj = NULL, key = NULL, ...)
 }
 \arguments{
 \item{query}{(character) query terms, as a single character vector}
@@ -17,6 +24,31 @@ scopus_search(query = NULL, count = 25, start = 0, type = "search",
 \item{type}{(character) type of search, default: search}
 
 \item{search_type}{(character) search type, default: scopus}
+
+\item{facets}{(list) facets, see
+https://dev.elsevier.com/tecdoc_api_facets.html for how to construct
+facet queries}
+
+\item{view}{the fields to return, see
+https://dev.elsevier.com/guides/ScopusSearchViews.htm}
+
+\item{date}{Represents the date range associated with the search,
+with the lowest granularity being year. e.g. 2002-2007}
+
+\item{sort}{Represents the sort field name and order. A plus in front of
+the sort field name indicates ascending order, a minus indicates
+descending order. If sort order is not specified (i.e. no + or -) then
+the order defaults to ascending (ASC). Up to three fields can be
+specified, each delimited by a comma. The precedence is determined by
+their order (i.e. first is primary, second is secondary, and
+third is tertiary). . e.g., "overDate,-title"}
+
+\item{content}{filter specific categories of content that should be
+searched/returned. one of: core, dummy, all (default)}
+
+\item{subj}{the subject area code associated with the content category
+desired. Note that these subject code mapping vary based upon the
+environment in which the request is executed. See Details for choices.}
 
 \item{key}{(character) api key. get a key at
 \url{https://dev.elsevier.com/index.html}}
@@ -34,7 +66,43 @@ be able to make 20K again.
 
 See \url{https://dev.elsevier.com/api_key_settings.html} for rate
 limit information.
+
+See \url{https://dev.elsevier.com/tips/ScopusSearchTips.htm} for help/tips
+on searching
 }
+\section{subj choices include}{
+
+\itemize{
+\item AGRI: Agricultural and Biological Sciences
+\item ARTS: Arts and Humanities
+\item BIOC: Biochemistry, Genetics and Molecular Biology
+\item BUSI: Business, Management and Accounting
+\item CENG: Chemical Engineering
+\item CHEM: Chemistry
+\item COMP: Computer Science
+\item DECI: Decision Sciences
+\item DENT: Dentistry
+\item EART: Earth and Planetary Sciences
+\item ECON: Economics, Econometrics and Finance
+\item ENER: Energy
+\item ENGI: Engineering
+\item ENVI: Environmental Science
+\item HEAL: Health Professions
+\item IMMU: Immunology and Microbiology
+\item MATE: Materials Science
+\item MATH: Mathematics
+\item MEDI: Medicine
+\item NEUR: Neuroscience
+\item NURS: Nursing
+\item PHAR: Pharmacology, Toxicology and Pharmaceutics
+\item PHYS: Physics and Astronomy
+\item PSYC: Psychology
+\item SOCI: Social Sciences
+\item VETE: Veterinary
+\item MULT: Multidisciplinary
+}
+}
+
 \examples{
 \dontrun{
 res <- scopus_search(query = "ecology")
@@ -44,6 +112,29 @@ res
 
 # looping through
 res <- scopus_search_loop(query = "ecology community elk cow")
+
+# using facets
+## scopus_search
+res <- scopus_search(query = "ecology", facets = "subjarea(count=5)")
+res
+res$`search-results`$link
+res$`search-results`$entry
+res$`search-results`$facet
+
+## more examples
+x <- scopus_search(query = "ecology", facets = "language(count=4)", count = 1)
+x$`search-results`$facet
+x <- scopus_search(query = "ecology", facets = "pubyear(count=3);doctype();language(count=4)")
+x$`search-results`$facet
+
+## scopus_search_loop
+res <- scopus_search_loop(query = "ecology", facets = "subjarea(count=5)", count = 200)
+res$found
+head(res$results)
+res$facets
+
+# sort
+x <- scopus_search(query = "ecology", sort = "-title")
 }
 }
 \keyword{internal}

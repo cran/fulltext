@@ -7,8 +7,8 @@
 \alias{eupmc_xml}
 \title{Europe PMC utilities}
 \usage{
-eupmc_search(query, resulttype = NULL, synonym = FALSE, per_page = 25,
-  page = 1, ...)
+eupmc_search(query, resulttype = NULL, synonym = FALSE,
+  per_page = 25, page = 1, ...)
 
 eupmc_fields(...)
 
@@ -70,5 +70,8 @@ head(eupmc_fields())
 # get full text XML
 eupmc_xml('PMC3257301')
 }
+}
+\references{
+https://europepmc.org/RestfulWebService
 }
 \keyword{internal}
