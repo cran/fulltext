@@ -1,5 +1,8 @@
 context("ft_get")
 
+# delete all files before testing 
+ftxt_cache$delete_all()
+
 test_that("ft_get basic functionality works ...", {
   skip_on_cran()
 
@@ -62,11 +65,28 @@ test_that("ft_get works for all data providers", {
   expect_is(oo, "ft_data")
 })
 
+# this DOI is for an OA article, but the URL we get from Crossref doesn't work
+# this one fails on the first try as it uses 
+# https://bsapubs.onlinelibrary.wiley.com/doi/full/10.3732/ajb.1700190 
+# on the first try, then runs again with 
+# https://bsapubs.onlinelibrary.wiley.com/doi/pdf/10.3732/ajb.1700190
+test_that("ft_get: wiley problems", {
+  skip_on_cran()
+
+  aa <- sm(ft_get(x = '10.3732/AJB.1700190'))
+
+  expect_is(aa, "ft_data")
+  expect_is(aa$wiley, "list")
+  expect_equal(aa$wiley$errors$error, NA_character_)
+})
+
 test_that("ft_get fails well", {
   skip_on_cran()
 
   expect_error(ft_get('0086169', from = 'plos'), "These are probably not DOIs")
   expect_error(ft_get('0086169', from = 'stuff'), "'arg' should be one")
+  expect_error(ft_get('0086169', progress = 5), 
+    "progress must be of class logical")
 })
 
 test_that("ft_get errors slot", {
@@ -85,4 +105,56 @@ test_that("ft_get errors slot", {
 
   expect_error(ft_get('0086169', from = 'plos'), "These are probably not DOIs")
   expect_error(ft_get('0086169', from = 'stuff'), "'arg' should be one")
+})
+
+context("ft_get: progress bars")
+test_that("ft_get: entrez", {
+  skip_on_cran()
+
+  ftxt_cache$delete_all()
+
+  entrez_dois <- c('10.1186/2049-2618-2-7', '10.1186/2193-1801-3-7')
+  # 1st run, get progress bar
+  expect_output(
+    ft_get(entrez_dois, from = "entrez", progress = TRUE),
+    "==========="
+  )
+  # subsequent runs, also get progress bar
+  expect_output(
+    ft_get(entrez_dois, from = "entrez", progress = TRUE),
+    "==========="
+  )
+  # if progress=FALSE, no bar, but do get path exists messages
+  expect_message(
+    ft_get(entrez_dois, from = "entrez", progress = FALSE),
+    "path exists"
+  )
+})
+
+test_that("ft_get: elife", {
+  skip_on_cran()
+
+  ftxt_cache$delete_all()
+
+  elife_dois <- c('10.7554/eLife.04300', '10.7554/eLife.03032')
+  # 1st run, get progress bar
+  expect_output(
+    ft_get(elife_dois, from='elife', progress = TRUE),
+    "==========="
+  )
+  # subsequent runs, also get progress bar
+  expect_output(
+    ft_get(elife_dois, from='elife', progress = TRUE),
+    "==========="
+  )
+  # if progress=FALSE, no bar, but do get path exists messages
+  expect_message(
+    ft_get(elife_dois, from='elife', progress = FALSE),
+    "path exists"
+  )
+  # same if goes through get_unknown path
+  expect_output(
+    ft_get(elife_dois, progress = TRUE),
+    "==========="
+  )
 })

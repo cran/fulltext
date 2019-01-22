@@ -145,7 +145,20 @@ check_dois <- function(x) {
 }
 
 is_or <- function(x, clazzes) {
-  if (!class(x) %in% clazzes) stop("Input to x must be one of class ", paste0(clazzes, collapse = ", "), call. = FALSE)
+  if (!inherits(x, clazzes)) {
+    stop("Input to x must be one of class ", 
+      paste0(clazzes, collapse = ", "), 
+      call. = FALSE)
+  }
+}
+
+assert <- function(x, y) {
+  if (!is.null(x)) {
+    if (!inherits(x, y)) {
+      stop(deparse(substitute(x)), " must be of class ",
+        paste0(y, collapse = ", "), call. = FALSE)
+    }
+  }
 }
 
 strextract <- function(str, pattern) regmatches(str, regexpr(pattern, str))
@@ -184,3 +197,22 @@ rbl <- function(x) {
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 `%<|>%` <- function(x, y) if (length(x) == 0) y else x
+
+httr_write_disk <- function(path, overwrite) {
+  if (!overwrite && file.exists(path)) {
+    stop("Path exists and overwrite is FALSE", 
+      call. = FALSE)
+  }
+  structure(list(
+    method = NULL,
+    url = NULL,
+    headers = NULL,
+    fields = NULL,
+    options = NULL,
+    auth_token = NULL,
+    output = structure(list(
+      path = path,
+      file = NULL
+    ), class = c("write_disk", "write_function"))
+  ), classs = "request")
+}

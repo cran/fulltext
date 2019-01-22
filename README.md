@@ -31,9 +31,13 @@ rOpenSci has a number of R packages to get either full text, metadata, or both f
 * Fetch articles - `ft_get`
 * Get links for full text articles (xml, pdf) - `ft_links`
 * Extract text from articles / convert formats - `ft_extract`
-* Collect bits of articles that you actually need - `ft_chunks`/`ft_tabularize`
 * Collect all texts into a data.frame - `ft_table`
-* Download supplementary materials from papers - `ft_get_si`
+
+Previously supported use cases, extracted out to other packages:
+
+* Collect bits of articles that you actually need - moved to package [pubchunks][]
+* Supplementary data from papers has been moved to the [suppdata][] package
+
 
 It's easy to go from the outputs of `ft_get` to text-mining packages such as 
 [tm](https://cran.r-project.org/package=tm) and 
@@ -54,14 +58,12 @@ available via Pubmed)
 Authentication: A number of publishers require authentication via API key, and some even more
 draconian authentication processes involving checking IP addresses. We are working on supporting
 all the various authentication things for different publishers, but of course all the OA content
-is already easily available.
+is already easily available. See the **Authentication** section in `?fulltext-package` after 
+loading the package.
 
 We'd love your feedback. Let us know what you think in [the issue tracker](https://github.com/ropensci/fulltext/issues)
 
 Article full text formats by publisher:  [https://github.com/ropensci/fulltext/blob/master/vignettes/formats.Rmd](https://github.com/ropensci/fulltext/blob/master/vignettes/formats.Rmd)
-
-_Important Note_: Supplementary data from papers is being moved to the [suppdata][] package.
-Once `suppdata` is on CRAN, we'll deprecate the `ft_get_si` function here; after which point `suppdata` focuses on supplementary materials and `fulltext` focuses on the papers themselves.
 
 
 ## Installation
@@ -97,7 +99,7 @@ ft_search(query = 'ecology', from = 'crossref')
 #> Query:
 #>   [ecology] 
 #> Found:
-#>   [PLoS: 0; BMC: 0; Crossref: 155437; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
+#>   [PLoS: 0; BMC: 0; Crossref: 157839; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
 #> Returned:
 #>   [PLoS: 0; BMC: 0; Crossref: 10; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]
 ```
@@ -108,11 +110,11 @@ ft_search(query = 'ecology', from = 'crossref')
 
 
 ```r
-res1 <- ft_search(query = 'ecology', from = 'entrez', limit = 5)
+res1 <- ft_search(query = 'biology', from = 'entrez', limit = 5)
 ft_links(res1)
 #> <fulltext links>
-#> [Found] 1 
-#> [IDs] ID_29429126 ...
+#> [Found] 5 
+#> [IDs] ID_30253098 ID_28731711 ID_28097372 ID_27582426 ID_22243231 ...
 ```
 
 Or pass in DOIs directly
@@ -121,8 +123,8 @@ Or pass in DOIs directly
 ```r
 ft_links(res1$entrez$data$doi, from = "entrez")
 #> <fulltext links>
-#> [Found] 1 
-#> [IDs] ID_29429126 ...
+#> [Found] 5 
+#> [IDs] ID_30253098 ID_28731711 ID_28097372 ID_27582426 ID_22243231 ...
 ```
 
 ## Get full text
@@ -142,64 +144,64 @@ ft_get('10.7717/peerj.228')
 
 
 ```r
+library(pubchunks)
 x <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'), from = "elife")
-x %>% ft_collect() %>% ft_chunks("publisher") %>% ft_tabularize()
+x %>% ft_collect() %>% pub_chunks("publisher") %>% pub_tabularize()
 #> $elife
-#>                          publisher
-#> 1 eLife Sciences Publications, Ltd
-#> 2 eLife Sciences Publications, Ltd
+#> $elife$`10.7554/eLife.03032`
+#>                          publisher .publisher
+#> 1 eLife Sciences Publications, Ltd      elife
+#> 
+#> $elife$`10.7554/eLife.32763`
+#>                          publisher .publisher
+#> 1 eLife Sciences Publications, Ltd      elife
 ```
 
 Get multiple fields at once
 
 
 ```r
-x %>% ft_collect() %>% ft_chunks(c("doi","publisher")) %>% ft_tabularize()
+x %>% ft_collect() %>% pub_chunks(c("doi","publisher")) %>% pub_tabularize()
 #> $elife
-#>                   doi                        publisher
-#> 1 10.7554/eLife.03032 eLife Sciences Publications, Ltd
-#> 2 10.7554/eLife.32763 eLife Sciences Publications, Ltd
+#> $elife$`10.7554/eLife.03032`
+#>                   doi                        publisher .publisher
+#> 1 10.7554/eLife.03032 eLife Sciences Publications, Ltd      elife
+#> 
+#> $elife$`10.7554/eLife.32763`
+#>                   doi                        publisher .publisher
+#> 1 10.7554/eLife.32763 eLife Sciences Publications, Ltd      elife
 ```
 
-Use `dplyr` to data munge
+Pull out the data.frame's
 
 
 ```r
-library("dplyr")
 x %>%
   ft_collect() %>% 
-  ft_chunks(c("doi", "publisher", "permissions")) %>%
-  ft_tabularize() %>%
-  .$elife %>%
-  select(-permissions.license, -permissions.license_url)
-#>                   doi                        publisher
-#> 1 10.7554/eLife.03032 eLife Sciences Publications, Ltd
-#> 2 10.7554/eLife.32763 eLife Sciences Publications, Ltd
-#>   permissions.copyright.statement permissions.copyright.year
-#> 1              © 2014, Zhao et al                       2014
-#> 2            © 2017, Mhatre et al                       2017
-#>   permissions.copyright.holder permissions.free_to_read
-#> 1                   Zhao et al                     <NA>
-#> 2                 Mhatre et al
-```
-
-## Supplementary materials
-
-Grab supplementary materials for (re-)analysis of data
-
-`ft_get_si()` accepts article identifiers, and output from `ft_search()`, `ft_get()`
-
-
-```r
-catching.crabs <- read.csv(ft_get_si("10.6084/m9.figshare.979288", 2))
-head(catching.crabs)
-#>   trap.no. length.deployed no..crabs
-#> 1        1          10 sec         0
-#> 2        2          10 sec         0
-#> 3        3          10 sec         0
-#> 4        4          10 sec         0
-#> 5        5          10 sec         0
-#> 6        1           1 min         0
+  pub_chunks(c("doi", "publisher", "author")) %>%
+  pub_tabularize() %>%
+  .$elife
+#> $`10.7554/eLife.03032`
+#>                   doi                        publisher authors.given_names
+#> 1 10.7554/eLife.03032 eLife Sciences Publications, Ltd                  Ya
+#>   authors.surname authors.given_names.1 authors.surname.1
+#> 1            Zhao                 Jimin               Lin
+#>   authors.given_names.2 authors.surname.2 authors.given_names.3
+#> 1               Beiying                Xu                  Sida
+#>   authors.surname.3 authors.given_names.4 authors.surname.4
+#> 1                Hu                   Xue             Zhang
+#>   authors.given_names.5 authors.surname.5 .publisher
+#> 1                Ligang                Wu      elife
+#> 
+#> $`10.7554/eLife.32763`
+#>                   doi                        publisher authors.given_names
+#> 1 10.7554/eLife.32763 eLife Sciences Publications, Ltd             Natasha
+#>   authors.surname authors.given_names.1 authors.surname.1
+#> 1          Mhatre                Robert            Malkin
+#>   authors.given_names.2 authors.surname.2 authors.given_names.3
+#> 1                Rittik               Deb                Rohini
+#>   authors.surname.3 authors.given_names.4 authors.surname.4 .publisher
+#> 1      Balakrishnan                Daniel            Robert      elife
 ```
 
 ## Extract text from PDFs
@@ -211,10 +213,6 @@ Locally, using code adapted from the package `tm`, and two pdf to text parsing b
 
 ```r
 pdf <- system.file("examples", "example2.pdf", package = "fulltext")
-```
-
-
-```r
 ft_extract(pdf)
 #> <document>/Library/Frameworks/R.framework/Versions/3.5/Resources/library/fulltext/examples/example2.pdf
 #>   Title: pone.0107412 1..10
@@ -227,6 +225,17 @@ ft_extract(pdf)
 
 ```r
 cache_options_set(path = (td <- 'foobar'))
+#> $cache
+#> [1] TRUE
+#> 
+#> $backend
+#> [1] "ext"
+#> 
+#> $path
+#> [1] "/Users/sckott/Library/Caches/R/foobar"
+#> 
+#> $overwrite
+#> [1] FALSE
 res <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'), type = "pdf")
 library(readtext)
 x <- readtext::readtext(file.path(cache_options_get()$path, "*.pdf"))
@@ -255,3 +264,4 @@ quanteda::corpus(x)
 [![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
 
 [suppdata]: https://github.com/ropensci/suppdata
+[pubchunks]: https://github.com/ropensci/pubchunks

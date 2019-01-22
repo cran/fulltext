@@ -22,14 +22,23 @@
 #' ftdoi.org or at Crossref we skip with a warning. If found with ftdoi.org or 
 #' Crossref we attempt to download. Only applicable in `character` and `list`
 #' S3 methods. Default: `TRUE`
-#' @param plosopts PLOS options. See [rplos::plos_fulltext()]
+#' @param plosopts PLOS options, a named list. See [rplos::plos_fulltext()]
 #' @param bmcopts BMC options. parameter DEPRECATED
-#' @param entrezopts Entrez options. See [rentrez::entrez_search()] and
-#' [entrez_fetch()]
-#' @param elifeopts eLife options
-#' @param elsevieropts Elsevier options
-#' @param crossrefopts Crossref options
-#' @param wileyopts Wiley options
+#' @param entrezopts Entrez options, a named list. See [rentrez::entrez_search()] 
+#' and [entrez_fetch()]
+#' @param elifeopts eLife options, a named list. 
+#' @param elsevieropts Elsevier options, a named list. 
+#' @param crossrefopts Crossref options, a named list. 
+#' @param wileyopts Wiley options, a named list. 
+#' @param progress (logical) whether to show progress bar or not. default: `FALSE`. if 
+#' `TRUE`, we use [utils::txtProgressBar()] and [utils::setTxtProgressBar]
+#' to create the progress bar; and each progress bar connection is closed 
+#' on function exit. A progress bar is run for each data source. 
+#' Works for all S3 methods except `ft_get.links`. When articles are not 
+#' already downloaded you see the progress bar. If articles are already 
+#' downloaded/cached, normally we throw messages saying so, but if a 
+#' progress bar is requested, then the messages are suppressed to 
+#' not interrupt the progress bar.
 #' @param ... Further args passed on to [crul::HttpClient]
 #' 
 #' @seealso [as.ft_data()]
@@ -84,9 +93,18 @@
 #' articles, where "recent" may be a few months to a year or so. In that case, 
 #' make sure to specify the publisher, or else you'll get back no data.
 #' 
+#' @section Important Access Notes:
 #' See **Rate Limits** and **Authentication** in 
 #' [fulltext-package] for rate limiting and authentication information,
-#' respectively
+#' respectively.
+#' 
+#' In particular, take note that when fetching full text from Wiley and 
+#' Elsevier, the only way that's done (unless it's one of their OA papers) 
+#' is through the Crossref TDM flow in which you need a Crossref TDM API 
+#' key and your institution needs to have access to the exact journal you 
+#' are trying to fetch a paper from. If your institution doesn't have 
+#' access you may still get a result, but likely its only the abstract.
+#' See **Authentication** in [fulltext-package] for details.
 #' 
 #' @section Notes on the `type` parameter:
 #' Type is sometimes ignored, sometimes used. For certain data sources, 
@@ -341,85 +359,118 @@
 #' ### no link available for this DOI
 #' res <- ft_get('10.1037/10740-005', try_unknown = TRUE)
 #' res$crossref
+#' 
+#' # Get a progress bar - off by default
+#' library(rplos)
+#' (dois <- searchplos(q="*:*", fl='id',
+#'    fq=list('doc_type:full',"article_type:\"research article\""), limit=5)$data$id)
+#' ## when articles not already downloaded you see the progress bar
+#' b <- ft_get(dois, from='plos', progress = TRUE)
+#' ## if articles already downloaded/cached, normally we through messages saying so
+#' b <- ft_get(dois, from='plos', progress = FALSE)
+#' ## but if a progress bar is requested, then the messages are suppressed
+#' b <- ft_get(dois, from='plos', progress = TRUE)
 #' }
 
-ft_get <- function(x, from = NULL, type = "xml", try_unknown = TRUE, plosopts = list(),
-                   bmcopts = list(), entrezopts = list(), elifeopts = list(),
-                   elsevieropts = list(), wileyopts = list(), 
-                   crossrefopts = list(), ...) {
+ft_get <- function(x, from = NULL, type = "xml", try_unknown = TRUE, 
+  plosopts = list(), bmcopts = list(), entrezopts = list(), 
+  elifeopts = list(), elsevieropts = list(), wileyopts = list(), 
+  crossrefopts = list(), progress = FALSE, ...) {
+
   UseMethod("ft_get")
 }
 
 #' @export
-ft_get.default <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plosopts=list(),
-                           bmcopts=list(), entrezopts=list(), elifeopts=list(),
-                           elsevieropts = list(), wileyopts = list(), 
-                           crossrefopts = list(), ...){
+ft_get.default <- function(x, from=NULL, type = "xml", try_unknown = TRUE,
+  plosopts=list(), bmcopts=list(), entrezopts=list(), elifeopts=list(),
+  elsevieropts = list(), wileyopts = list(), crossrefopts = list(), 
+  progress = FALSE, ...) {
+
   stop("no 'ft_get' method for ", class(x), call. = FALSE)
 }
 
 #' @export
-ft_get.character <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plosopts=list(),
-                             bmcopts = list(), entrezopts=list(),
-                             elifeopts=list(),
-                             elsevieropts = list(), wileyopts = list(), 
-                             crossrefopts = list(), ...) {
+ft_get.character <- function(x, from=NULL, type = "xml", try_unknown = TRUE, 
+  plosopts=list(), bmcopts = list(), entrezopts=list(), elifeopts=list(),
+  elsevieropts = list(), wileyopts = list(), crossrefopts = list(), 
+  progress = FALSE, ...) {
+
   check_type(type)
+  assert(progress, "logical")
   check_cache()
   if (!is.null(from)) {
     from <- match.arg(from, c("plos", "entrez", "elife", "pensoft",
       "arxiv", "biorxiv", "elsevier", "wiley"))
-    plos_out <- plugin_get_plos(from, x, plosopts, type, ...)
-    entrez_out <- plugin_get_entrez(from, x, entrezopts, type, ...)
-    elife_out <- plugin_get_elife(from, x, elifeopts, type, ...)
-    pensoft_out <- plugin_get_pensoft(from, x, list(), type, ...)
-    arxiv_out <- plugin_get_arxiv(from, x, list(), type, ...)
-    biorxiv_out <- plugin_get_biorxiv(from, x, list(), type, ...)
-    els_out <- plugin_get_elsevier(from, x, elsevieropts, type, ...)
-    wiley_out <- plugin_get_wiley(from, x, wileyopts, type, ...)
+    plos_out <- plugin_get_plos(from, x, plosopts, type, 
+      progress = progress, ...)
+    entrez_out <- plugin_get_entrez(from, x, entrezopts, type, 
+      progress = progress, ...)
+    elife_out <- plugin_get_elife(from, x, elifeopts, type, 
+      progress = progress, ...)
+    pensoft_out <- plugin_get_pensoft(from, x, list(), type, 
+      progress = progress, ...)
+    arxiv_out <- plugin_get_arxiv(from, x, list(), type, 
+      progress = progress, ...)
+    biorxiv_out <- plugin_get_biorxiv(from, x, list(), type, 
+      progress = progress, ...)
+    els_out <- plugin_get_elsevier(from, x, elsevieropts, type, 
+      progress = progress, ...)
+    wiley_out <- plugin_get_wiley(from, x, wileyopts, type, 
+      progress = progress, ...)
     structure(list(plos = plos_out, entrez = entrez_out, elife = elife_out,
                    pensoft = pensoft_out, arxiv = arxiv_out,
                    biorxiv = biorxiv_out, elsevier = els_out, 
                    wiley = wiley_out), class = "ft_data")
   } else {
-    get_unknown(x, type, try_unknown, ...)
+    get_unknown(x, type, try_unknown, progress, ...)
   }
 }
 
 #' @export
-ft_get.list <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plosopts=list(),
-                        bmcopts = list(), entrezopts=list(), elifeopts=list(),
-                        elsevieropts = list(), wileyopts = list(), 
-                        crossrefopts = list(), ...) {
+ft_get.list <- function(x, from=NULL, type = "xml", try_unknown = TRUE, 
+  plosopts=list(), bmcopts = list(), entrezopts=list(), elifeopts=list(), 
+  elsevieropts = list(), wileyopts = list(), crossrefopts = list(), 
+  progress = FALSE, ...) {
+
   check_type(type)
+  assert(progress, "logical")
   check_cache()
   if (!is.null(from)) {
     from <- match.arg(from, c("plos", "entrez", "elife", "pensoft", 
       "arxiv", "biorxiv", "elsevier", "wiley"))
-    plos_out <- plugin_get_plos(from, x, plosopts, type, ...)
-    entrez_out <- plugin_get_entrez(from, x, entrezopts, type, ...)
-    elife_out <- plugin_get_elife(from, x, elifeopts, type, ...)
-    pensoft_out <- plugin_get_pensoft(from, x, list(), type, ...)
-    arxiv_out <- plugin_get_arxiv(from, x, list(), type, ...)
-    biorxiv_out <- plugin_get_biorxiv(from, x, list(), type, ...)
-    els_out <- plugin_get_elsevier(from, x, elsevieropts, type, ...)
-    wiley_out <- plugin_get_wiley(from, x, wileyopts, type, ...)
+    plos_out <- plugin_get_plos(from, x, plosopts, type, 
+      progress = progress, ...)
+    entrez_out <- plugin_get_entrez(from, x, entrezopts, type, 
+      progress = progress, ...)
+    elife_out <- plugin_get_elife(from, x, elifeopts, type, 
+      progress = progress, ...)
+    pensoft_out <- plugin_get_pensoft(from, x, list(), type, 
+      progress = progress, ...)
+    arxiv_out <- plugin_get_arxiv(from, x, list(), type, 
+      progress = progress, ...)
+    biorxiv_out <- plugin_get_biorxiv(from, x, list(), type, 
+      progress = progress, ...)
+    els_out <- plugin_get_elsevier(from, x, elsevieropts, type, 
+      progress = progress, ...)
+    wiley_out <- plugin_get_wiley(from, x, wileyopts, type, 
+      progress = progress, ...)
     structure(list(plos = plos_out, entrez = entrez_out, elife = elife_out,
                    pensoft = pensoft_out, arxiv = arxiv_out,
                    biorxiv = biorxiv_out, elsevier = els_out, 
                    wiley = wiley_out), class = "ft_data")
   } else {
-    get_unknown(x, type, try_unknown, ...)
+    get_unknown(x, type, try_unknown, progress, ...)
   }
 }
 
 #' @export
-ft_get.ft <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plosopts=list(),
-                      bmcopts=list(), entrezopts=list(), elifeopts=list(),
-                      elsevieropts = list(), wileyopts = list(), 
-                      crossrefopts = list(), ...) {
+ft_get.ft <- function(x, from=NULL, type = "xml", try_unknown = TRUE, 
+  plosopts=list(), bmcopts=list(), entrezopts=list(), elifeopts=list(), 
+  elsevieropts = list(), wileyopts = list(), crossrefopts = list(), 
+  progress = FALSE, ...) {
 
   check_type(type)
+  assert(progress, "logical")
   check_cache()
   # warn on sources that aren't supported yet and will be skipped
   from <- names(x[sapply(x, function(v) !is.null(v$data))])
@@ -433,9 +484,10 @@ ft_get.ft <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plosopts=l
     ))
   }
 
-  plos_out <- plugin_get_plos(from, x$plos$data$id, plosopts, type, ...)
-  entrez_out <- plugin_get_entrez(from, x$entrez$data$doi,
-                                  entrezopts, type, ...)
+  plos_out <- plugin_get_plos(from, x$plos$data$id, plosopts, type, 
+    progress = progress, ...)
+  entrez_out <- plugin_get_entrez(from, x$entrez$data$doi, 
+    entrezopts, type, progress = progress, ...)
   cr_out <- NULL
   if ("crossref" %in% from) {
     crl <- ft_links(x$crossref$data$doi, from = "crossref")
@@ -447,10 +499,10 @@ ft_get.ft <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plosopts=l
 }
 
 #' @export
-ft_get.ft_links <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plosopts=list(),
-                            bmcopts=list(), entrezopts=list(), elifeopts=list(),
-                            elsevieropts = list(), wileyopts = list(), 
-                            crossrefopts = list(), ...){
+ft_get.ft_links <- function(x, from=NULL, type = "xml", try_unknown = TRUE, 
+  plosopts=list(), bmcopts=list(), entrezopts=list(), elifeopts=list(),
+  elsevieropts = list(), wileyopts = list(), crossrefopts = list(), 
+  progress = FALSE, ...) {
 
   check_type(type)
   check_cache()
@@ -467,7 +519,8 @@ ft_get.ft_links <- function(x, from=NULL, type = "xml", try_unknown = TRUE, plos
 #' @export
 #' @rdname ft_get
 ft_get_ls <- function() {
-  nms <- ls(getNamespace("fulltext"), all.names = TRUE, pattern = "plugin_get_")
+  nms <- ls(getNamespace("fulltext"), all.names = TRUE, 
+    pattern = "plugin_get_")
   nms <- grep("_links|generator", nms, invert = TRUE, value = TRUE)
   gsub("plugin_get_", "", nms)
 }
@@ -485,7 +538,8 @@ print.ft_data <- function(x, ...) {
   totgot <- sum(unlist(pluck(x, "found")))
 
   cat(sprintf("[Docs] %s", totgot), "\n")
-  cat(sprintf("[Source] %s %s", print_backend(cache_options_get()$backend), expand_if(cache_options_get()$path)), "\n")
+  cat(sprintf("[Source] %s %s", print_backend(cache_options_get()$backend), 
+    expand_if(cache_options_get()$path)), "\n")
   cat(ft_wrap(sprintf("[IDs]\n %s ...", namesprint)), "\n")
 }
 
@@ -506,7 +560,7 @@ print_backend <- function(x) {
 
 
 # get unknown from DOIs where from=NULL ------------------
-get_unknown <- function(x, type, try_unknown, ...) {
+get_unknown <- function(x, type, try_unknown, progress = FALSE, ...) {
   pubs <- Filter(function(z) !is.null(z) && length(z) > 0, 
     stats::setNames(lapply(x, get_publisher), x))
   df <- data.frame(pub = unlist(unname(pubs)), doi = names(pubs), 
@@ -560,12 +614,13 @@ get_unknown <- function(x, type, try_unknown, ...) {
 
         pub_nm <- dfsplit[[i]]$name[1]
         out[[ pub_nm ]] <- fun(tm_nm, dfsplit[[i]]$doi, list(), type, 
-          url_pattern, ...)
+          url_pattern, progress = progress, ...)
       }
     } else {
       pub_nm <- get_pub_name(names(dfsplit)[i])
       tm_nm <- get_tm_name(names(dfsplit)[i])
-      out[[ pub_nm ]] <- fun(tm_nm, dfsplit[[i]]$doi, list(), type, url_pattern, ...)
+      out[[ pub_nm ]] <- fun(tm_nm, dfsplit[[i]]$doi, list(), type, 
+        url_pattern, progress = progress, ...)
     }
   }
   structure(out, class = "ft_data")

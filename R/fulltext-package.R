@@ -24,10 +24,7 @@
 #' - get abstracts - [ft_abstract()]
 #' - extract text from pdfs - [ft_extract()]
 #' - serialize to different data formats - [ft_serialize()]
-#' - extract certain article sections (e.g., authors) - [ft_chunks()]
-#' - grab supplementary materials for (re-)analysis of data -
-#'  [ft_get_si()] accepts article identifiers, and output from
-#'  [ft_search()] and  [ft_get()]
+#' - extract certain article sections (e.g., authors) - moved to \pkg{pubchunks}
 #'
 #' @section DOI delays:
 #' Beware that DOIs are not searchable via Crossref/Entrez immediately. The
@@ -68,17 +65,22 @@
 #' 
 #' **BMC**: BMC is integrated into Springer Publishers now, 
 #' and that API requires an API key.  Get your key by signing up at 
-#' <https://dev.springer.com/>, then you'll get a key. Pass the key to a 
+#' https://dev.springer.com/, then you'll get a key. Pass the key to a 
 #' named parameter `key` to `bmcopts`. Or, save your key in your `.Renviron` 
 #' file as `SPRINGER_KEY`, and we'll read it in for you, and you don't 
 #' have to pass in anything.
 #' 
-#' **Scopus**: Scopus requires an API key to search their service. Go to 
-#' <https://dev.elsevier.com/index.html>, register for an account, 
-#' then when you're in your account, create an API key. Pass in as variable 
-#' `key` to `scopusopts`, or store your key under the name 
+#' **Scopus**: Scopus requires two things: an API key and your institution must
+#' have access. For the API key, go to https://dev.elsevier.com/index.html, 
+#' register for an account, then when you're in your account, create an API key. 
+#' Pass in as variable `key` to `scopusopts`, or store your key under the name 
 #' `ELSEVIER_SCOPUS_KEY` as an environment variable in `.Renviron`, and 
-#' we'll read it in for you. See [Startup] for help.
+#' we'll read it in for you. See [Startup] for help. For the institution access
+#' go to a browser and see if you have access to the journal(s) you want. 
+#' If you don't have access in a browser you probably won't have access via 
+#' this package. If you aren't physically at your institution you will likely 
+#' need to be on a VPN or similar so that your IP address is in the range 
+#' that the two publishers are accepting for that institution.
 #'  
 #' **Microsoft**: Get a key by creating an Azure account at 
 #' <https://www.microsoft.com/cognitive-services/en-us/subscriptions>, 
@@ -91,9 +93,35 @@
 #' **Crossref**: Crossref encourages requests with contact information 
 #' (an email address) and will forward you to a dedicated API cluster 
 #' for improved performance when you share your email address with them.
-#' <https://github.com/CrossRef/rest-api-doc#good-manners--more-reliable-service>
+#' https://github.com/CrossRef/rest-api-doc#good-manners--more-reliable-service
 #' To pass your email address to Crossref via this client, store it 
-#' as an environment variable in `.Renviron` like `crossref_email = name@example.com`
+#' as an environment variable in `.Renviron` like 
+#' `crossref_email = name@example.com`
+#' 
+#' **Crossref TDM**: TDM = "Text and Data Mining". This applies to the few 
+#' publishers - Wiley and Elsevier - that are part of this program (TDM). 
+#' When using [ft_get()], and you want to get papers from these two publishers,
+#' you'll need two things: 
+#' (1) an API key for the Crossref TDM. Go to 
+#' https://apps.crossref.org/clickthrough/researchers and you'll be asked to 
+#' login with your ORCID. If you don't have an ORCID go to https://orcid.org/
+#' and get one. After logging in with your ORCID, click on the "API token" 
+#' tag and grab your API key. Put your API key in `.Renviron` file or similar
+#' (e.g. `.zshrc` or `.bash_profile`, etc.) with the entry 
+#' `CROSSREF_TDM=yourkey`. We'll look for the environment variable CROSSREF_TDM
+#' within this package. See http://tdmsupport.crossref.org/ for more 
+#' information on the Crossref TDM program.
+#' (2) Your institution needs to have access to the journal you're requesting
+#' papers from. If you're not sure about this just go to a browser and see if you
+#' have access to the journal(s) you want. If you don't have access in a browser 
+#' you probably won't have access via this package. If you aren't physically at 
+#' your institution you will likely need to be on a VPN or similar so that 
+#' your IP address is in the range that the two publishers are accepting for 
+#' that institution. Also talk to your librarian if you aren't sure about 
+#' access or have questions about it. In some cases, you may also need to request
+#' that Elsevier removes a "fence" for your institution - that is, your institution
+#' has access to XYZ journal(s), but they don't yet allow programmatic access. 
+#' This has happened at least a few times that I know of.
 #' 
 #' **Entrez**: NCBI limits users to making only 3 requests per second. But, users 
 #' who register for an API key are able to make up to ten requests per second. 
@@ -117,8 +145,6 @@
 #' @importFrom xml2 read_html read_xml xml_find_first xml_find_all xml_text
 #' xml_contents xml_attr xml_ns xml_children xml_name xml_ns_strip
 #' @importFrom crul HttpClient
-#' @importFrom httr HEAD GET POST upload_file content_type content write_disk
-#' stop_for_status
 #' @importFrom rentrez entrez_search entrez_fetch entrez_link entrez_summary
 #' @importFrom rplos searchplos plos_fulltext
 #' @importFrom rcrossref cr_works cr_ft_links
