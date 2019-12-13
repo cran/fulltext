@@ -14,6 +14,13 @@ construct_paths <- function(co, x, type){
   }
 }
 
+type_in <- function(type, types, name) {
+  if (!type %in% types) {
+    stop(sprintf("'type' for %s must be %s", name,
+      paste0(sprintf("'%s'", types), collapse=", ")))
+  }
+}
+
 pprint_cache <- function(x) list(backend = NULL, path = x, data = NULL)
 
 make_key <- function(id, type) {
@@ -197,6 +204,7 @@ plugin_get_amersocmicrobiol <- plugin_get_generator("amersocmicrobiol", amersocm
 plugin_get_amersocclinoncol <- plugin_get_generator("amersocclinoncol", amersocclinoncol_ft)
 plugin_get_instinvestfil <- plugin_get_generator("instinvestfil", instinvestfil_ft)
 plugin_get_aip <- plugin_get_generator("aip", aip_ft)
+plugin_get_cambridge <- plugin_get_generator("cambridge", cambridge_ft)
 
 # lapply replacement with progress bar: actual a for loop internally
 plapply <- function(x, FUN, type = NULL, progress = FALSE, ...) {
@@ -223,7 +231,7 @@ plos_wrapper <- function(dois, type, progress = FALSE, ...) {
       if (!progress) message(paste0("path exists: ", path))
       return(ft_object(path, x, type))
     }
-    tmp <- tryCatch(.plos_fulltext(x, disk = path, ...), 
+    tmp <- tryCatch(.plos_fulltext(x, disk = path, type = type, ...), 
       error = function(e) e, 
       warning = function(w) w)
     if (inherits(tmp, c("error", "warning"))) {
@@ -320,6 +328,7 @@ bmc_ft <- function(dois, type = "xml", progress = FALSE, ...) {
 
 # type: xml and pdf
 elife_ft <- function(dois, type, progress = FALSE, ...) {
+  type_in(type, c('pdf', 'xml'), "elife")
   elife_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
@@ -336,6 +345,7 @@ elife_ft <- function(dois, type, progress = FALSE, ...) {
 
 # type: xml and pdf
 peerj_ft <- function(dois, type, progress = FALSE, ...) {
+  type_in(type, c('pdf', 'xml'), "peerj")
   peerj_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
@@ -351,6 +361,7 @@ peerj_ft <- function(dois, type, progress = FALSE, ...) {
 
 # type: xml and pdf
 frontiersin_ft <- function(dois, type, progress = FALSE, ...) {
+  type_in(type, c('pdf', 'xml'), "frontiersin")
   fronteiersin_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
@@ -366,6 +377,7 @@ frontiersin_ft <- function(dois, type, progress = FALSE, ...) {
 
 # type: xml and pdf
 pensoft_ft <- function(dois, type, progress = FALSE, ...) {
+  type_in(type, c('pdf', 'xml'), "pensoft")
   pensoft_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
@@ -386,6 +398,7 @@ pensoft_ft <- function(dois, type, progress = FALSE, ...) {
 
 # type: xml and pdf
 copernicus_ft <- function(dois, type, progress = FALSE, ...) {
+  type_in(type, c('pdf', 'xml'), "copernicus")
   copernicus_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
@@ -436,7 +449,7 @@ biorxiv_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
 # type: plain and xml
 elsevier_ft <- function(dois, type, progress = FALSE, retain_non_ft = FALSE, ...) {
   assert(retain_non_ft, "logical")
-  if (!type %in% c('plain', 'xml')) stop("'type' for Elsevier must be 'plain' or 'xml'")
+  type_in(type, c('plain', 'xml'), "elsevier")
   elsevier_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
@@ -465,7 +478,7 @@ elsevier_ft <- function(dois, type, progress = FALSE, retain_non_ft = FALSE, ...
 
 # type: plain and xml
 sciencedirect_ft <- function(dois, type, progress = FALSE, ...) {
-  if (!type %in% c('plain', 'xml')) stop("'type' for ScienceDirect must be 'plain' or 'xml'")
+  type_in(type, c('plain', 'xml'), "sciencedirect")
   sciencedirect_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
@@ -508,47 +521,27 @@ sciencedirect_ft <- function(dois, type, progress = FALSE, ...) {
   plapply(dois, sciencedirect_fun, type, progress, ...)
 }
 
-# type: only pdf (type parameter is ignored)
-wiley_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
+# type: pdf and xml
+wiley_ft <- function(dois, type, progress = FALSE, ...) {
+  type_in(type, c('pdf', 'xml'), "wiley")
   wiley_fun <- function(x, type, progress, ...) {
-    path <- make_key(x, 'pdf')
+    path <- make_key(x, type)
     if (file.exists(path) && !cache_options_get()$overwrite) {
       if (!progress) message(paste0("path exists: ", path))
-      return(ft_object(path, x, 'pdf'))
+      return(ft_object(path, x, type))
     }
-    res <- tcat(rcrossref::cr_works(dois = x))
-    if (inherits(res, c("error", "warning"))) return(ft_error(res$message, x))
-    res <- res$data$link[[1]]
-    url <- res[res$content.type == "unspecified" & 
-      res$intended.application == "text-mining", "URL"][[1]]
-    if (length(url) == 0) {
-      url <- res[res$content.type == "unspecified" & 
-        res$intended.application == "similarity-checking", "URL"][[1]]
-    }
-    if (is.null(url)) {
-      mssg <- "has no link available"
-      warning(x, " ", mssg, call. = FALSE)
-      return(ft_error(mssg, x))
-    }
-    # fix url if highwire url detected
-    # AFAIK AJB is the only journal with this problem where they used to be at
-    # Highwire, then moved to Wiley - the highwire links do not work, all 
-    # throw 403
-    if (any(grepl("highwire", url))) {
-      url <- paste0("https://onlinelibrary.wiley.com/doi/pdf/", x)
+    if (type == "pdf") {
+      url <- paste0("https://api.wiley.com/onlinelibrary/tdm/v1/articles/",
+        sub("/", "%2F", x))
+    } else {
+      url <- paste0("https://onlinelibrary.wiley.com/doi/full-xml/",
+        sub("/", "%2F", x))
     }
     header <- list(
       `CR-Clickthrough-Client-Token` = Sys.getenv("CROSSREF_TDM"),
-      Accept = "application/pdf"
+      Accept = paste0(switch(type, xml = "application/", pdf = "application/"), type)
     )
-    res <- suppressWarnings(get_ft(x, 'pdf', url, path, header, ...))
-    # if failed try a different url
-    if (is.null(res$path)) {
-      url <- sub("full", "pdf", url)
-      res <- get_ft(x, 'pdf', url, path, header, ...)
-    }
-    # if the new url fails, oh well, we tried
-    res
+    suppressWarnings(get_ft(x, type, url, path, header, ...))
   }
   plapply(dois, wiley_fun, type, progress, ...)
 }
@@ -784,6 +777,31 @@ aip_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
   plapply(dois, aip_fun, type, progress, ...)
 }
 
+# type: only pdf (type parameter is ignored)
+cambridge_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
+  cambridge_fun <- function(x, type, progress, ...) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      if (!progress) message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+    res <- tcat(crul::HttpClient$new(url = paste0("https://doi.org/", x),
+      opts=list(followlocation=1))$get())
+    if (inherits(res, c("error", "warning")) || !res$success()) {
+      mssg <- if (inherits(res, c("error", "warning"))) res$message else http_mssg(res)
+      return(ft_error(mssg, x))
+    }
+    html <- xml2::read_html(res$parse("UTF-8"))
+    node <- xml2::xml_find_first(html, "//meta[@name=\"citation_pdf_url\"]")
+    url <- xml2::xml_attr(node, "content")
+    if (all(is.na(url))) {
+      mssg <- "no pdf link found or you may not have access to the article"
+      return(ft_error(mssg, x))
+    }
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }
+  plapply(dois, cambridge_fun, type, progress, ...)
+}
 
 # special Crossref plugin to try any DOI
 crossref_ft <- function(dois, type, progress = FALSE, ...) {

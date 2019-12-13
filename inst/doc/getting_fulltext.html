@@ -227,8 +227,7 @@ hr {
 data from more than 1 data source.</p>
 
 <pre><code class="r">names(res)
-#&gt; [1] &quot;plos&quot;          &quot;entrez&quot;        &quot;elife&quot;         &quot;pensoft&quot;       &quot;arxiv&quot;        
-#&gt; [6] &quot;biorxiv&quot;       &quot;elsevier&quot;      &quot;sciencedirect&quot; &quot;wiley&quot;  
+#&gt; [1] &quot;plos&quot;          &quot;entrez&quot;        &quot;elife&quot;         &quot;pensoft&quot;       &quot;arxiv&quot;         &quot;biorxiv&quot;       &quot;elsevier&quot;      &quot;sciencedirect&quot; &quot;wiley&quot;
 </code></pre>
 
 <p>Let&#39;s dig into the <code>plos</code> source object, which is another list, including metadata the 
@@ -350,16 +349,12 @@ collect it from the file on disk. See <code>ft_collect()</code> to get the text.
 <pre><code class="r">library(&quot;rplos&quot;)
 (dois &lt;- searchplos(q = &quot;*:*&quot;, fl = &#39;id&#39;,
    fq = list(&#39;doc_type:full&#39;, &quot;article_type:\&quot;research article\&quot;&quot;), limit = 5)$data$id)
-#&gt; [1] &quot;10.1371/journal.pone.0044136&quot; &quot;10.1371/journal.pone.0155491&quot;
-#&gt; [3] &quot;10.1371/journal.pone.0058100&quot; &quot;10.1371/journal.pone.0168627&quot;
-#&gt; [5] &quot;10.1371/journal.pone.0184491&quot;
+#&gt; [1] &quot;10.1371/journal.pone.0020843&quot; &quot;10.1371/journal.pone.0022257&quot; &quot;10.1371/journal.pone.0023139&quot; &quot;10.1371/journal.pone.0023138&quot; &quot;10.1371/journal.pone.0023119&quot;
 ft_get(dois, from = &#39;plos&#39;)
 #&gt; &lt;fulltext text&gt;
 #&gt; [Docs] 5 
 #&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 10.1371/journal.pone.0044136 10.1371/journal.pone.0155491
-#&gt;      10.1371/journal.pone.0058100 10.1371/journal.pone.0168627
-#&gt;      10.1371/journal.pone.0184491 ...
+#&gt; [IDs] 10.1371/journal.pone.0020843 10.1371/journal.pone.0022257 10.1371/journal.pone.0023139 10.1371/journal.pone.0023138 10.1371/journal.pone.0023119 ...
 </code></pre>
 
 <h2>Different data sources</h2>
@@ -402,15 +397,12 @@ ft_get(doi, from = &quot;entrez&quot;)
 #&gt; Query:
 #&gt;   [ecology] 
 #&gt; Found:
-#&gt;   [PLoS: 0; BMC: 0; Crossref: 0; Entrez: 163320; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
+#&gt;   [PLoS: 0; BMC: 0; Crossref: 0; Entrez: 185437; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
 #&gt; Returned:
 #&gt;   [PLoS: 0; BMC: 0; Crossref: 0; Entrez: 10; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]
 res$entrez$data$doi
-#&gt;  [1] &quot;10.1155/2018/8930374&quot;       &quot;10.1155/2018/4519094&quot;      
-#&gt;  [3] &quot;10.1038/s41467-018-08039-3&quot; &quot;10.1038/s41467-018-08232-4&quot;
-#&gt;  [5] &quot;10.1038/s41467-018-08188-5&quot; &quot;10.1038/s41598-018-36133-5&quot;
-#&gt;  [7] &quot;10.1038/s41598-018-37331-x&quot; &quot;10.1038/sdata.2018.309&quot;    
-#&gt;  [9] &quot;10.1038/sdata.2018.299&quot;     &quot;10.1038/s41467-018-08237-z&quot;
+#&gt;  [1] &quot;10.3748/wjg.v25.i45.6579&quot;    &quot;10.1038/s41467-019-13800-3&quot;  &quot;10.7554/eLife.49826&quot;         &quot;10.5365/wpsar.2018.9.5.005&quot;  &quot;10.1038/s41598-019-55147-1&quot; 
+#&gt;  [6] &quot;10.1038/s41598-019-54857-w&quot;  &quot;10.1038/s41598-019-55028-7&quot;  &quot;10.1038/s41598-019-55204-9&quot;  &quot;10.5423/PPJ.OA.05.2019.0129&quot; &quot;10.5423/PPJ.NT.08.2019.0216&quot;
 </code></pre>
 
 <p>Get articles</p>
@@ -419,7 +411,7 @@ res$entrez$data$doi
 #&gt; &lt;fulltext text&gt;
 #&gt; [Docs] 3 
 #&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 6313974 6312606 6335468 ...
+#&gt; [IDs] 6906207 6904573 6904214 ...
 </code></pre>
 
 <h2>Collect full text from file on disk</h2>
@@ -452,9 +444,9 @@ by the identifier</p>
 #&gt; $`10.1371/journal.pone.0086169`
 #&gt; {xml_document}
 #&gt; &lt;article article-type=&quot;research-article&quot; dtd-version=&quot;3.0&quot; lang=&quot;en&quot; xmlns:mml=&quot;http://www.w3.org/1998/Math/MathML&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
-#&gt; [1] &lt;front&gt;\n  &lt;journal-meta&gt;\n    &lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt; ...
-#&gt; [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n    &lt;title&gt;Introduction&lt;/title&gt;\n    &lt;p&gt;Sin ...
-#&gt; [3] &lt;back&gt;\n  &lt;ack&gt;\n    &lt;p&gt;We thank Joan Silk, Julienne Rutherford, and ...
+#&gt; [1] &lt;front&gt;\n  &lt;journal-meta&gt;\n    &lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt;PLoS ONE&lt;/journal-id&gt;\n    &lt;journal-id journal-id-type=&quot;publisher-id&quot;&gt;plos&lt;/journal-id&gt;\n    &lt;journal-id j ...
+#&gt; [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n    &lt;title&gt;Introduction&lt;/title&gt;\n    &lt;p&gt;Since the 1970s, biologists have directed substantial research effort to understanding adaptive sex-biased al ...
+#&gt; [3] &lt;back&gt;\n  &lt;ack&gt;\n    &lt;p&gt;We thank Joan Silk, Julienne Rutherford, and two anonymous reviewers for their comments on earlier drafts of the manuscript.&lt;/p&gt;\n  &lt;/ack&gt;\n  &lt;ref-lis ...
 </code></pre>
 
 </body>

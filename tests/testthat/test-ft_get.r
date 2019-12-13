@@ -65,6 +65,23 @@ test_that("ft_get works for all data providers", {
   expect_is(oo, "ft_data")
 })
 
+
+test_that("ft_get works for pdf for plos provider", {
+  skip_on_cran()
+
+  ## PLOS
+  aa <- sm(ft_get('10.1371/journal.pone.0086169', type = "pdf"))
+
+  expect_is(aa, "ft_data")
+  expect_is(aa$plos, "list")
+  expect_match(aa$plos$data$path[[1]]$path, "pdf")
+  expect_match(aa$plos$data$path[[1]]$type, "pdf")
+  expect_is(pdftools::pdf_text(aa$plos$data$path[[1]]$path),
+    "character")
+})
+
+
+
 # THIS IS NO LONGER THE CASE, BELOW TEST IN ITS PLACE NOW
 # this DOI is for an OA article, but the URL we get from Crossref doesn't work
 # this one fails on the first try as it uses
@@ -99,6 +116,17 @@ test_that("ft_get fails well", {
   expect_error(ft_get('0086169', from = 'stuff'), "'arg' should be one")
   expect_error(ft_get('0086169', progress = 5),
     "progress must be of class logical")
+
+  # hits check_type fxn
+  expect_error(ft_get('10.7554/eLife.03032', type = "foobar"),
+    "parameter must be")
+
+  # hits check_type fxn
+  expect_error(ft_get('10.7554/eLife.03032', type = "plain"),
+    "'type' for elife must be")
+  expect_error(
+    ft_get("10.1016/j.trac.2016.01.027", from = "elsevier", type = "pdf"),
+    "'type' for elsevier must be")
 })
 
 test_that("ft_get errors slot", {
@@ -197,25 +225,25 @@ test_that("ft_get curl options work", {
   # pensoft
   out_pensoft <- sw(ft_get('10.3897/mycokeys.22.12528', from = "pensoft",
     timeout_ms = 1))
-  expect_match(out_pensoft$pensoft$errors$error, "time")
+  expect_match(out_pensoft$pensoft$errors$error, "[Tt]ime")
 
   # arxiv
   out_arxiv <- sw(ft_get('cond-mat/9309029', from = "arxiv", timeout_ms = 1))
-  expect_match(out_arxiv$arxiv$errors$error, "time")
+  expect_match(out_arxiv$arxiv$errors$error, "[Tt]ime")
 
   # biorxiv
   out_biorxiv <- sw(ft_get('10.1101/012476', from = "biorxiv", timeout_ms = 1))
-  expect_match(out_biorxiv$biorxiv$errors$error, "time")
+  expect_match(out_biorxiv$biorxiv$errors$error, "[Tt]ime")
 
   # elsevier
   out_elsevier <- sw(ft_get("10.1016/j.trac.2016.01.027", from = "elsevier",
     timeout_ms = 1))
-  expect_match(out_elsevier$elsevier$errors$error, "time")
+  expect_match(out_elsevier$elsevier$errors$error, "[Tt]ime")
 
   # wiley
   out_wiley <- sw(ft_get("10.1006/asle.2001.0035", from = "wiley",
     timeout_ms = 1))
-  expect_match(out_wiley$wiley$errors$error, "time")
+  expect_match(out_wiley$wiley$errors$error, "[Tt]ime")
 })
 
 # cleanup - delete all files

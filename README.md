@@ -10,16 +10,15 @@ _/ ____\_ __|  | |  |_/  |_  ____ ___  ____/  |_
 ```
 
 [![cran checks](https://cranchecks.info/badges/worst/fulltext)](https://cranchecks.info/pkgs/fulltext)
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Build Status](https://api.travis-ci.org/ropensci/fulltext.svg)](https://travis-ci.org/ropensci/fulltext)
-<!-- [![Build status](https://ci.appveyor.com/api/projects/status/y487h3ec5wc2s20m/branch/master?svg=true)](https://ci.appveyor.com/project/sckott/fulltext/branch/master) -->
 [![codecov.io](https://codecov.io/github/ropensci/fulltext/coverage.svg?branch=master)](https://codecov.io/github/ropensci/fulltext?branch=master)
-[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/fulltext)](https://github.com/metacran/cranlogs.app)
-[![cran version](http://www.r-pkg.org/badges/version/fulltext)](https://cran.r-project.org/package=fulltext)
+[![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/fulltext)](https://github.com/metacran/cranlogs.app)
+[![cran version](https://www.r-pkg.org/badges/version/fulltext)](https://cran.r-project.org/package=fulltext)
 
 __Get full text articles from lots of places__
 
-Checkout the [fulltext manual](https://ropenscilabs.github.io/fulltext-book/) to get started.
+Checkout the [fulltext manual](https://books.ropensci.org/fulltext/) to get started.
 
 -----
 
@@ -99,7 +98,7 @@ ft_search(query = 'ecology', from = 'crossref')
 #> Query:
 #>   [ecology] 
 #> Found:
-#>   [PLoS: 0; BMC: 0; Crossref: 193485; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
+#>   [PLoS: 0; BMC: 0; Crossref: 201140; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
 #> Returned:
 #>   [PLoS: 0; BMC: 0; Crossref: 10; Entrez: 0; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]
 ```
@@ -113,8 +112,8 @@ ft_search(query = 'ecology', from = 'crossref')
 res1 <- ft_search(query = 'biology', from = 'entrez', limit = 5)
 ft_links(res1)
 #> <fulltext links>
-#> [Found] 3 
-#> [IDs] ID_31091453 ID_28140597 ID_24657234 ...
+#> [Found] 5 
+#> [IDs] ID_31472450 ID_30692680 ID_30656621 ID_29887338 ID_28674916 ...
 ```
 
 Or pass in DOIs directly
@@ -123,8 +122,8 @@ Or pass in DOIs directly
 ```r
 ft_links(res1$entrez$data$doi, from = "entrez")
 #> <fulltext links>
-#> [Found] 3 
-#> [IDs] ID_31091453 ID_28140597 ID_24657234 ...
+#> [Found] 5 
+#> [IDs] ID_31472450 ID_30692680 ID_30656621 ID_29887338 ID_28674916 ...
 ```
 
 ## Get full text
@@ -184,24 +183,24 @@ x %>%
 #> $`10.7554/eLife.03032`
 #>                   doi                        publisher authors.given_names
 #> 1 10.7554/eLife.03032 eLife Sciences Publications, Ltd                  Ya
-#>   authors.surname authors.given_names.1 authors.surname.1
-#> 1            Zhao                 Jimin               Lin
-#>   authors.given_names.2 authors.surname.2 authors.given_names.3
-#> 1               Beiying                Xu                  Sida
-#>   authors.surname.3 authors.given_names.4 authors.surname.4
-#> 1                Hu                   Xue             Zhang
-#>   authors.given_names.5 authors.surname.5 .publisher
-#> 1                Ligang                Wu      elife
+#>   authors.surname authors.given_names.1 authors.surname.1 authors.given_names.2
+#> 1            Zhao                 Jimin               Lin               Beiying
+#>   authors.surname.2 authors.given_names.3 authors.surname.3
+#> 1                Xu                  Sida                Hu
+#>   authors.given_names.4 authors.surname.4 authors.given_names.5
+#> 1                   Xue             Zhang                Ligang
+#>   authors.surname.5 .publisher
+#> 1                Wu      elife
 #> 
 #> $`10.7554/eLife.32763`
 #>                   doi                        publisher authors.given_names
 #> 1 10.7554/eLife.32763 eLife Sciences Publications, Ltd             Natasha
-#>   authors.surname authors.given_names.1 authors.surname.1
-#> 1          Mhatre                Robert            Malkin
-#>   authors.given_names.2 authors.surname.2 authors.given_names.3
-#> 1                Rittik               Deb                Rohini
-#>   authors.surname.3 authors.given_names.4 authors.surname.4 .publisher
-#> 1      Balakrishnan                Daniel            Robert      elife
+#>   authors.surname authors.given_names.1 authors.surname.1 authors.given_names.2
+#> 1          Mhatre                Robert            Malkin                Rittik
+#>   authors.surname.2 authors.given_names.3 authors.surname.3
+#> 1               Deb                Rohini      Balakrishnan
+#>   authors.given_names.4 authors.surname.4 .publisher
+#> 1                Daniel            Robert      elife
 ```
 
 ## Extract text from PDFs
@@ -250,7 +249,7 @@ quanteda::corpus(x)
 
 ## Contributors
 
-* Scott Chamberlain <http://github.com/sckott>
+* Scott Chamberlain <https://github.com/sckott>
 * Will Pearse <https://github.com/willpearse>
 * Katrin Leinweber <https://github.com/katrinleinweber>
 

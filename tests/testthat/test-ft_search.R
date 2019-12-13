@@ -28,7 +28,9 @@ test_that("ft_search returns...", {
   expect_is(aa$plos$data, "data.frame")
   expect_is(aa$plos$data$id, "character")
   
-  expect_named(bb$plos$data, c("id", "alm_twitterCount", "counter_total_all", "journal", "eissn", "author"))
+  expect_equal(
+    sort(names(bb$plos$data)),
+    sort(c("id", "alm_twitterCount", "counter_total_all", "journal", "eissn", "author")))
   
   expect_is(cc$crossref$data, "data.frame")
   expect_true(cc$crossref$opts$filter[[1]])
@@ -103,17 +105,17 @@ test_that("ft_search curl options work", {
   # plos
   expect_error(
     ft_search(query='ecology', from='plos', timeout_ms = 1),
-    "time")
+    "[Tt]ime")
 
   # bmc
   expect_error(
     ft_search(query='ecology', from='bmc', timeout_ms = 1),
-    "time")
+    "[Tt]ime")
 
   # crossref
   expect_error(
     ft_search(query='ecology', from='crossref', timeout_ms = 1),
-    "time")
+    "[Tt]ime")
 
   # entrez - dont include, httr not in suggests
   # expect_error(
@@ -123,22 +125,22 @@ test_that("ft_search curl options work", {
   # biorxiv
   expect_error(
     ft_search(query='ecology', from='biorxiv', timeout_ms = 1),
-    "time")
+    "[Tt]ime")
 
   # europe pmc
   expect_error(
     ft_search(query='ecology', from='europmc', timeout_ms = 1),
-    "time")
+    "[Tt]ime")
 
   # scopus
   expect_error(
     ft_search(query='ecology', from='scopus', timeout_ms = 1),
-    "time")
+    "[Tt]ime")
 
   # microsoft academic
   expect_error(
     ft_search("Y='19'...", from='microsoft',
       maopts = list(key = Sys.getenv("MICROSOFT_ACADEMIC_KEY")),
       timeout_ms = 1),
-    "time")
+    "[Tt]ime")
 })

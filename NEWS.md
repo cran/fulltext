@@ -1,3 +1,25 @@
+fulltext 1.4.0
+==============
+
+### NEW FEATURES
+
+* `ft_get()` gains a new publisher plugin: Cambridge. its not available in the `from` parameter, but if you pass in a Cambridge DOI, a plugin now exists to attempt to get the pdf (xml not provided) (#195)
+
+### MINOR IMPROVEMENTS
+
+* Wiley now provides xml (in addition to pdf) for at least some articles. So `ft_get()` for Wiley now supports `type="xml"` in addition to `type="pdf"` (#209)
+* reduce duplicated code in `ft_get` plugins for checking `type` parameter (#210)
+* changed Wiley plugin for `ft_get()`: using different URLs for attempting to fetch articles, those with base url `api.wiley.com` instead of `onlinelibrary.wiley.com` (#191)
+
+### BUG FIXES
+
+* `ft_get()` wasn't allowing `type="pdf"` for PLOS data source; now allowed in addition to xml; also plos requests for articles now using http instead of http (#205) thanks @clbti for the report
+* fix to internal fxn `fat_cat_search_one()` used inside of `ft_get()`: fixed data.frame subsetting error due to sometimes missing columns (#206)
+* fix to `ft_links()`: was erroring when publisher not supported yet; now gives back no data (#207)
+* `ft_browse()` was failing when `what="macrodocs"` selected; macrodocs.org is now dead; `what` parameter now defunct  (#208)
+* fix `ft_table()` - was failing on reading malformed files (e.g., an xml file with pdf content inside)  (#211)
+
+
 fulltext 1.3.0
 ==============
 
@@ -96,7 +118,7 @@ fulltext 1.0.1
 fulltext 1.0
 ============
 
-Check out the [fulltext manual](https://ropenscilabs.github.io/fulltext-book/) for detailed documentation.
+Check out the [fulltext manual](https://books.ropensci.org/fulltext/) for detailed documentation.
 
 `fulltext` has undergone a re-organization, which includes a bump in the major version to `v1` to reinforce the large changes the package has undergone. Changes include:
 
