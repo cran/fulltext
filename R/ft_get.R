@@ -36,8 +36,8 @@
 #' @param crossrefopts Crossref options, a named list.
 #' @param wileyopts Wiley options, a named list.
 #' @param progress (logical) whether to show progress bar or not.
-#' default: `FALSE`. if `TRUE`, we use [utils::txtProgressBar()] and
-#' [utils::setTxtProgressBar]
+#' default: `FALSE`. if `TRUE`, we use `utils::txtProgressBar()` and
+#' `utils::setTxtProgressBar()`
 #' to create the progress bar; and each progress bar connection is closed
 #' on function exit. A progress bar is run for each data source.
 #' Works for all S3 methods except `ft_get.links`. When articles are not
@@ -448,7 +448,8 @@ ft_get.character <- function(x, from=NULL, type = "xml", try_unknown = TRUE,
   check_cache()
   if (!is.null(from)) {
     from <- match.arg(from, c("plos", "entrez", "elife", "pensoft",
-      "arxiv", "biorxiv", "elsevier", "sciencedirect", "wiley"))
+      "arxiv", "biorxiv", "elsevier", "sciencedirect", "wiley"),
+      several.ok = TRUE)
     plos_out <- plugin_get_plos(from, x, plosopts, type,
       progress = progress, ...)
     entrez_out <- plugin_get_entrez(from, x, entrezopts, type,
@@ -488,7 +489,8 @@ ft_get.list <- function(x, from=NULL, type = "xml", try_unknown = TRUE,
   check_cache()
   if (!is.null(from)) {
     from <- match.arg(from, c("plos", "entrez", "elife", "pensoft",
-      "arxiv", "biorxiv", "elsevier", "sciencedirect", "wiley"))
+      "arxiv", "biorxiv", "elsevier", "sciencedirect", "wiley"),
+      several.ok = TRUE)
     plos_out <- plugin_get_plos(from, x, plosopts, type,
       progress = progress, ...)
     entrez_out <- plugin_get_entrez(from, x, entrezopts, type,
@@ -721,7 +723,8 @@ publisher_plugin <- function(x) {
     `233` = plugin_get_amersocclinoncol,
     `8215` = plugin_get_instinvestfil,
     `317` = plugin_get_aip,
-    `56` = plugin_get_cambridge
+    `56` = plugin_get_cambridge,
+    `237` = plugin_get_cob
   )
 }
 
@@ -759,6 +762,7 @@ get_pub_name <- function(x) {
          `175` = "rsoc",
          `1822` = "cdc",
          `56` = "cambridge",
+         `237` = "cob",
          "crossref"
   )
 }
@@ -793,6 +797,7 @@ get_tm_name <- function(x) {
          `8215` = "instinvestfil",
          `317` = "aip",
          `56` = "cambridge",
+         `237` = "cob",
          "crossref"
   )
 }
@@ -838,7 +843,8 @@ fat_cat_search_one <- function(dois, fields, size) {
   df <- out[, fields]
   df$message <- rep(NA_character_, NROW(df))
   # add rows for DOIs not found
-  not_found <- dois[!dois %in% out$doi]
+  doisstl <- tolower(sort(dois))
+  not_found <- doisstl[!doisstl %in% tolower(sort(out$doi))]
   if (length(not_found) > 0) {
     for (i in not_found) df <- rbind(df, c(i, "", "", "", "not found"))
   }
@@ -893,7 +899,7 @@ get_publisher2 <- function(x, ...) {
     prefix <- strextract(x[i], "[0-9]{2}\\.[0-9]+")
     mm <- mems[[which(prefix == vapply(mems, "[[", "", "prefix"))]]
     id <- mm$member
-    fcm <- fc_res[[which(x[[i]] == vapply(fc_res, "[[", "", "doi"))]]
+    fcm <- fc_res[[which(tolower(x[[i]]) == tolower(vapply(fc_res, "[[", "", "doi")))]]
     attr(id, "publisher") <- mm$name %||% ""
     attr(id, "issn") <- fcm$container_issnl %||% ""
     attr(id, "error") <- fcm$message

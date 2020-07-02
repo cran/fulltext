@@ -35,7 +35,7 @@ test_that("ft_get works for all data providers", {
   ## Hindawi - via Entrez
   ff <- sm(ft_get('10.1155/2014/292109'))
   ## F1000Research - via Entrez
-  gg <- sm(ft_get('10.12688/f1000research.6522.1'))
+  gg <- sw(sm(ft_get('10.12688/f1000research.6522.1')))
   ## Pensoft
   ## FIXME, used to work, no mas
   #hh <- sm(ft_get('10.3897/zookeys.499.8360', from = "pensoft"))
@@ -48,7 +48,7 @@ test_that("ft_get works for all data providers", {
   ## Karger Publisher - via Entrez
   nn <- sm(ft_get('10.1159/000369331'))
   ## CogentOA Publisher - via Entrez
-  oo <- sm(ft_get('10.1080/23311916.2014.938430'))
+  # oo <- sm(ft_get('10.1080/23311916.2014.938430'))
 
   expect_is(aa, "ft_data")
   expect_is(bb, "ft_data")
@@ -62,7 +62,24 @@ test_that("ft_get works for all data providers", {
   expect_is(kk, "ft_data")
   expect_is(mm, "ft_data")
   expect_is(nn, "ft_data")
-  expect_is(oo, "ft_data")
+  # expect_is(oo, "ft_data")
+})
+
+test_that("ft_get: > 1 from works", {
+  skip_on_cran()
+  skip_on_os("windows") # FIXME: not sure why, but his has failed on windows ci
+
+  plos_dois <- c('10.1371/journal.pone.0086169', '10.1371/journal.pbio.0000062')
+  aa <- sm(ft_get(plos_dois, from = c("plos", "entrez")))
+
+  expect_is(aa, "ft_data")
+  expect_is(aa$plos, "list")
+  expect_match(aa$plos$data$path[[1]]$path, "xml")
+  expect_match(aa$plos$data$path[[1]]$type, "xml")
+
+  expect_is(aa$entrez, "list")
+  expect_match(aa$entrez$data$path[[1]]$path, "xml")
+  expect_match(aa$entrez$data$path[[1]]$type, "xml")
 })
 
 
@@ -125,8 +142,8 @@ test_that("ft_get fails well", {
   expect_error(ft_get('10.7554/eLife.03032', type = "plain"),
     "'type' for elife must be")
   expect_error(
-    ft_get("10.1016/j.trac.2016.01.027", from = "elsevier", type = "pdf"),
-    "'type' for elsevier must be")
+    ft_get("10.1016/j.trac.2016.01.027", from = "elsevier", type = "add"),
+    "must be")
 })
 
 test_that("ft_get errors slot", {

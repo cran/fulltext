@@ -7,12 +7,17 @@ Description: Provides a single interface to many sources of full text
     included for searching for articles, downloading full or partial
     text, downloading supplementary materials, converting to various
     data formats.
-Version: 1.4.0
+Version: 1.5.0
 License: MIT + file LICENSE
-Authors@R: person("Scott", "Chamberlain",
-    role = c("aut", "cre"),
-    email = "myrmecocystus@gmail.com",
-    comment = c(ORCID = "0000-0003-1444-9135"))
+Authors@R: c(
+    person("Scott", "Chamberlain",
+        role = c("aut", "cre"),
+        email = "myrmecocystus@gmail.com",
+        comment = c(ORCID = "0000-0003-1444-9135")),
+    person(given = "rOpenSci",
+        role = "fnd",
+        comment = "https://ropensci.org/")
+    )
 URL: https://docs.ropensci.org/fulltext (website)
         https://github.com/ropensci/fulltext/ (devel)
         https://books.ropensci.org/fulltext/ (user manual)
@@ -25,15 +30,17 @@ Imports: crul (>= 0.7.0), magrittr, xml2 (>= 1.1.1), jsonlite, rplos
         (>= 0.8.0), rcrossref (>= 0.8.0), crminer (>= 0.2.0),
         microdemic (>= 0.2.0), aRxiv, rentrez (>= 1.1.0), data.table,
         hoardr (>= 0.5.0), pdftools, storr, tibble, digest
-Suggests: roxygen2 (>= 7.0.2), testthat, knitr, pubchunks
-RoxygenNote: 7.0.2
+Suggests: roxygen2 (>= 7.1.0), testthat, knitr, rmarkdown, pubchunks,
+        vcr
+RoxygenNote: 7.1.0
 X-schema.org-applicationCategory: Literature
 X-schema.org-keywords: text-mining, literature, pdf, xml, publications,
         citations, full-text, TDM
 X-schema.org-isPartOf: https://ropensci.org
 NeedsCompilation: no
-Packaged: 2019-12-13 19:33:53 UTC; sckott
-Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>)
+Packaged: 2020-07-02 05:10:05 UTC; sckott
+Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>),
+  rOpenSci [fnd] (https://ropensci.org/)
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-12-13 20:00:07 UTC
+Date/Publication: 2020-07-02 05:30:07 UTC

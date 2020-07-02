@@ -1,454 +1,545 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Load fulltext</title>
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<script type="text/javascript">
-window.onload = function() {
-  var imgs = document.getElementsByTagName('img'), i, img;
-  for (i = 0; i < imgs.length; i++) {
-    img = imgs[i];
-    // center an image if it is the only element of its parent
-    if (img.parentElement.childElementCount === 1)
-      img.parentElement.style.textAlign = 'center';
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Scott Chamberlain" />
+
+<meta name="date" content="2020-07-01" />
+
+<title>Getting full text</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
   }
-};
+});
 </script>
 
-<!-- Styles for R syntax highlighter -->
-<style type="text/css">
-   pre .operator,
-   pre .paren {
-     color: rgb(104, 118, 135)
-   }
 
-   pre .literal {
-     color: #990073
-   }
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 
-   pre .number {
-     color: #099;
-   }
-
-   pre .comment {
-     color: #998;
-     font-style: italic
-   }
-
-   pre .keyword {
-     color: #900;
-     font-weight: bold
-   }
-
-   pre .identifier {
-     color: rgb(0, 0, 0);
-   }
-
-   pre .string {
-     color: #d14;
-   }
 </style>
-
-<!-- R syntax highlighter -->
-<script type="text/javascript">
-var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
-hljs.initHighlightingOnLoad();
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
 </script>
 
 
 
-<style type="text/css">
-body, td {
-   font-family: sans-serif;
-   background-color: white;
-   font-size: 13px;
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
 }
-
-body {
-  max-width: 800px;
-  margin: auto;
-  padding: 1em;
-  line-height: 20px;
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
 }
-
-tt, code, pre {
-   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
 }
-
-h1 {
-   font-size:2.2em;
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
 }
-
-h2 {
-   font-size:1.8em;
+#TOC ul ul {
+margin-left: -2em;
 }
-
-h3 {
-   font-size:1.4em;
+#TOC li {
+line-height: 16px;
 }
-
-h4 {
-   font-size:1.0em;
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
 }
-
-h5 {
-   font-size:0.9em;
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
 }
-
-h6 {
-   font-size:0.8em;
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
 }
-
-a:visited {
-   color: rgb(50%, 0%, 50%);
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
 }
-
-pre, img {
-  max-width: 100%;
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
 }
 pre {
-  overflow-x: auto;
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
 }
-pre code {
-   display: block; padding: 0.5em;
+pre:not([class]) {
+background-color: #f7f7f7;
 }
-
 code {
-  font-size: 92%;
-  border: 1px solid #ccc;
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
 }
-
-code[class] {
-  background-color: #F8F8F8;
+p > code, li > code {
+padding: 2px 0px;
 }
-
-table, td, th {
-  border: none;
+div.figure {
+text-align: center;
 }
-
-blockquote {
-   color:#666666;
-   margin:0;
-   padding-left: 1em;
-   border-left: 0.5em #EEE solid;
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
 }
-
-hr {
-   height: 0px;
-   border-bottom: none;
-   border-top-width: thin;
-   border-top-style: dotted;
-   border-top-color: #999999;
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
 }
-
-@media print {
-   * {
-      background: transparent !important;
-      color: black !important;
-      filter:none !important;
-      -ms-filter: none !important;
-   }
-
-   body {
-      font-size:12pt;
-      max-width:100%;
-   }
-
-   a, a:visited {
-      text-decoration: underline;
-   }
-
-   hr {
-      visibility: hidden;
-      page-break-before: always;
-   }
-
-   pre, blockquote {
-      padding-right: 1em;
-      page-break-inside: avoid;
-   }
-
-   tr, img {
-      page-break-inside: avoid;
-   }
-
-   img {
-      max-width: 100% !important;
-   }
-
-   @page :left {
-      margin: 15mm 20mm 15mm 10mm;
-   }
-
-   @page :right {
-      margin: 15mm 10mm 15mm 20mm;
-   }
-
-   p, h2, h3 {
-      orphans: 3; widows: 3;
-   }
-
-   h2, h3 {
-      page-break-after: avoid;
-   }
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
 }
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
+
 
 
 
 </head>
 
 <body>
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Getting full text}
-%\VignetteEncoding{UTF-8}
--->
+
+
+
+
+<h1 class="title toc-ignore">Getting full text</h1>
+<h4 class="author">Scott Chamberlain</h4>
+<h4 class="date">2020-07-01</h4>
+
+
 
 <p>The main interface to fetching full text is through <code>ft_get()</code>.</p>
-
-<h2>Load fulltext</h2>
-
-<pre><code class="r">library(&quot;fulltext&quot;)
-</code></pre>
-
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;fulltext&quot;</span>)</span></code></pre></div>
+<div id="structure-of-the-returned-object-from-ft_get" class="section level2">
 <h2>Structure of the returned object from ft_get()</h2>
-
-<p>Simple call, pass in a DOI and say where you want to get data from (by default, it&#39;s <em>plos</em>)</p>
-
-<pre><code class="r">res &lt;- ft_get(&#39;10.1371/journal.pone.0086169&#39;, from = &#39;plos&#39;)
-</code></pre>
-
+<p>Simple call, pass in a DOI and say where you want to get data from (by default, it’s <em>plos</em>)</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>res &lt;-<span class="st"> </span><span class="kw">ft_get</span>(<span class="st">&#39;10.1371/journal.pone.0086169&#39;</span>, <span class="dt">from =</span> <span class="st">&#39;plos&#39;</span>)</span></code></pre></div>
 <p>The article text and metadata is stored in the output object.</p>
-
-<p>The <code>res</code> object is a list, with slots for each of the data sources, b/c you can request 
-data from more than 1 data source.</p>
-
-<pre><code class="r">names(res)
-#&gt; [1] &quot;plos&quot;          &quot;entrez&quot;        &quot;elife&quot;         &quot;pensoft&quot;       &quot;arxiv&quot;         &quot;biorxiv&quot;       &quot;elsevier&quot;      &quot;sciencedirect&quot; &quot;wiley&quot;
-</code></pre>
-
-<p>Let&#39;s dig into the <code>plos</code> source object, which is another list, including metadata the 
-text data itself (in the <code>data</code> slot).</p>
-
-<pre><code class="r">res$plos
-#&gt; $found
-#&gt; [1] 1
-#&gt; 
-#&gt; $dois
-#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;
-#&gt; 
-#&gt; $data
-#&gt; $data$backend
-#&gt; [1] &quot;ext&quot;
-#&gt; 
-#&gt; $data$cache_path
-#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext&quot;
-#&gt; 
-#&gt; $data$path
-#&gt; $data$path$`10.1371/journal.pone.0086169`
-#&gt; $data$path$`10.1371/journal.pone.0086169`$path
-#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext/10_1371_journal_pone_0086169.xml&quot;
-#&gt; 
-#&gt; $data$path$`10.1371/journal.pone.0086169`$id
-#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;
-#&gt; 
-#&gt; $data$path$`10.1371/journal.pone.0086169`$type
-#&gt; [1] &quot;xml&quot;
-#&gt; 
-#&gt; $data$path$`10.1371/journal.pone.0086169`$error
-#&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; 
-#&gt; $data$data
-#&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; $opts
-#&gt; $opts$doi
-#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;
-#&gt; 
-#&gt; $opts$type
-#&gt; [1] &quot;xml&quot;
-#&gt; 
-#&gt; $opts$progress
-#&gt; [1] FALSE
-#&gt; 
-#&gt; 
-#&gt; $errors
-#&gt;                             id error
-#&gt; 1 10.1371/journal.pone.0086169  &lt;NA&gt;
-</code></pre>
-
+<p>The <code>res</code> object is a list, with slots for each of the data sources, b/c you can request data from more than 1 data source.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">names</span>(res)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co">#&gt; [1] &quot;plos&quot;          &quot;entrez&quot;        &quot;elife&quot;         &quot;pensoft&quot;      </span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; [5] &quot;arxiv&quot;         &quot;biorxiv&quot;       &quot;elsevier&quot;      &quot;sciencedirect&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; [9] &quot;wiley&quot;</span></span></code></pre></div>
+<p>Let’s dig into the <code>plos</code> source object, which is another list, including metadata the text data itself (in the <code>data</code> slot).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>res<span class="op">$</span>plos</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; $found</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt; $dois</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; $data</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; $data$backend</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; [1] &quot;ext&quot;</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; $data$cache_path</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext&quot;</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt; </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; $data$path</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; $data$path$`10.1371/journal.pone.0086169`</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; $data$path$`10.1371/journal.pone.0086169`$path</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext/10_1371_journal_pone_0086169.xml&quot;</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; </span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; $data$path$`10.1371/journal.pone.0086169`$id</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; </span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; $data$path$`10.1371/journal.pone.0086169`$type</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; [1] &quot;xml&quot;</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; </span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; $data$path$`10.1371/journal.pone.0086169`$error</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; </span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt; </span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt; </span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; $data$data</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt; </span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt; </span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt; $opts</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt; $opts$doi</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co">#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="co">#&gt; </span></span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="co">#&gt; $opts$type</span></span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co">#&gt; [1] &quot;xml&quot;</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a><span class="co">#&gt; </span></span>
+<span id="cb4-42"><a href="#cb4-42"></a><span class="co">#&gt; $opts$progress</span></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a><span class="co">#&gt; </span></span>
+<span id="cb4-45"><a href="#cb4-45"></a><span class="co">#&gt; </span></span>
+<span id="cb4-46"><a href="#cb4-46"></a><span class="co">#&gt; $errors</span></span>
+<span id="cb4-47"><a href="#cb4-47"></a><span class="co">#&gt;                             id error</span></span>
+<span id="cb4-48"><a href="#cb4-48"></a><span class="co">#&gt; 1 10.1371/journal.pone.0086169  &lt;NA&gt;</span></span></code></pre></div>
 <p>Indexing to the <code>data</code> slot takes us to another list with metadata and the article</p>
-
-<pre><code class="r">res$plos$data
-#&gt; $backend
-#&gt; [1] &quot;ext&quot;
-#&gt; 
-#&gt; $cache_path
-#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext&quot;
-#&gt; 
-#&gt; $path
-#&gt; $path$`10.1371/journal.pone.0086169`
-#&gt; $path$`10.1371/journal.pone.0086169`$path
-#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext/10_1371_journal_pone_0086169.xml&quot;
-#&gt; 
-#&gt; $path$`10.1371/journal.pone.0086169`$id
-#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;
-#&gt; 
-#&gt; $path$`10.1371/journal.pone.0086169`$type
-#&gt; [1] &quot;xml&quot;
-#&gt; 
-#&gt; $path$`10.1371/journal.pone.0086169`$error
-#&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; 
-#&gt; $data
-#&gt; NULL
-</code></pre>
-
-<p>Going down one more index gets us the data object. There is no actual text as we have to 
-collect it from the file on disk. See <code>ft_collect()</code> to get the text.</p>
-
-<pre><code class="r">res$plos$data
-#&gt; $backend
-#&gt; [1] &quot;ext&quot;
-#&gt; 
-#&gt; $cache_path
-#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext&quot;
-#&gt; 
-#&gt; $path
-#&gt; $path$`10.1371/journal.pone.0086169`
-#&gt; $path$`10.1371/journal.pone.0086169`$path
-#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext/10_1371_journal_pone_0086169.xml&quot;
-#&gt; 
-#&gt; $path$`10.1371/journal.pone.0086169`$id
-#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;
-#&gt; 
-#&gt; $path$`10.1371/journal.pone.0086169`$type
-#&gt; [1] &quot;xml&quot;
-#&gt; 
-#&gt; $path$`10.1371/journal.pone.0086169`$error
-#&gt; NULL
-#&gt; 
-#&gt; 
-#&gt; 
-#&gt; $data
-#&gt; NULL
-</code></pre>
-
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>res<span class="op">$</span>plos<span class="op">$</span>data</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; $backend</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; [1] &quot;ext&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; </span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; $cache_path</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; </span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; $path</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$path</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext/10_1371_journal_pone_0086169.xml&quot;</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$id</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt; </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$type</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; [1] &quot;xml&quot;</span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$error</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; </span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; $data</span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
+<p>Going down one more index gets us the data object. There is no actual text as we have to collect it from the file on disk. See <code>ft_collect()</code> to get the text.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>res<span class="op">$</span>plos<span class="op">$</span>data</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt; $backend</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; [1] &quot;ext&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; </span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; $cache_path</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; $path</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$path</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; [1] &quot;/Users/sckott/Library/Caches/R/fulltext/10_1371_journal_pone_0086169.xml&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt; </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$id</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; [1] &quot;10.1371/journal.pone.0086169&quot;</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; </span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$type</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; [1] &quot;xml&quot;</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; $path$`10.1371/journal.pone.0086169`$error</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; </span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt; </span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt; </span></span>
+<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&gt; $data</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
+</div>
+<div id="fetching-many-articles" class="section level2">
 <h2>Fetching many articles</h2>
-
 <p>You can get a bunch of DOIs first, e.g., from PLOS using the <code>rplos</code> package</p>
-
-<pre><code class="r">library(&quot;rplos&quot;)
-(dois &lt;- searchplos(q = &quot;*:*&quot;, fl = &#39;id&#39;,
-   fq = list(&#39;doc_type:full&#39;, &quot;article_type:\&quot;research article\&quot;&quot;), limit = 5)$data$id)
-#&gt; [1] &quot;10.1371/journal.pone.0020843&quot; &quot;10.1371/journal.pone.0022257&quot; &quot;10.1371/journal.pone.0023139&quot; &quot;10.1371/journal.pone.0023138&quot; &quot;10.1371/journal.pone.0023119&quot;
-ft_get(dois, from = &#39;plos&#39;)
-#&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 5 
-#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 10.1371/journal.pone.0020843 10.1371/journal.pone.0022257 10.1371/journal.pone.0023139 10.1371/journal.pone.0023138 10.1371/journal.pone.0023119 ...
-</code></pre>
-
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">library</span>(<span class="st">&quot;rplos&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>(dois &lt;-<span class="st"> </span><span class="kw">searchplos</span>(<span class="dt">q =</span> <span class="st">&quot;*:*&quot;</span>, <span class="dt">fl =</span> <span class="st">&#39;id&#39;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3"></a>   <span class="dt">fq =</span> <span class="kw">list</span>(<span class="st">&#39;doc_type:full&#39;</span>, <span class="st">&quot;article_type:</span><span class="ch">\&quot;</span><span class="st">research article</span><span class="ch">\&quot;</span><span class="st">&quot;</span>), <span class="dt">limit =</span> <span class="dv">5</span>)<span class="op">$</span>data<span class="op">$</span>id)</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; [1] &quot;10.1371/journal.pone.0020843&quot; &quot;10.1371/journal.pone.0022257&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; [3] &quot;10.1371/journal.pone.0023139&quot; &quot;10.1371/journal.pone.0023138&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; [5] &quot;10.1371/journal.pone.0023119&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="kw">ft_get</span>(dois, <span class="dt">from =</span> <span class="st">&#39;plos&#39;</span>)</span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; &lt;fulltext text&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; [Docs] 5 </span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext </span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt; [IDs] 10.1371/journal.pone.0020843 10.1371/journal.pone.0022257</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt;      10.1371/journal.pone.0023139 10.1371/journal.pone.0023138</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt;      10.1371/journal.pone.0023119 ...</span></span></code></pre></div>
+</div>
+<div id="different-data-sources" class="section level2">
 <h2>Different data sources</h2>
-
+<div id="articles-from-elife" class="section level3">
 <h3>Articles from eLife</h3>
-
 <p>One article</p>
-
-<pre><code class="r">ft_get(&#39;10.7554/eLife.04300&#39;, from = &#39;elife&#39;)
-#&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 1 
-#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 10.7554/eLife.04300 ...
-</code></pre>
-
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">ft_get</span>(<span class="st">&#39;10.7554/eLife.04300&#39;</span>, <span class="dt">from =</span> <span class="st">&#39;elife&#39;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt; &lt;fulltext text&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; [Docs] 1 </span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext </span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt; [IDs] 10.7554/eLife.04300 ...</span></span></code></pre></div>
 <p>Many articles</p>
-
-<pre><code class="r">ft_get(c(&#39;10.7554/eLife.04300&#39;,&#39;10.7554/eLife.03032&#39;), from = &#39;elife&#39;)
-#&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 2 
-#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 10.7554/eLife.04300 10.7554/eLife.03032 ...
-</code></pre>
-
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">ft_get</span>(<span class="kw">c</span>(<span class="st">&#39;10.7554/eLife.04300&#39;</span>,<span class="st">&#39;10.7554/eLife.03032&#39;</span>), <span class="dt">from =</span> <span class="st">&#39;elife&#39;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="co">#&gt; &lt;fulltext text&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co">#&gt; [Docs] 2 </span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext </span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt; [IDs] 10.7554/eLife.04300 10.7554/eLife.03032 ...</span></span></code></pre></div>
+</div>
+<div id="articles-from-frontiers-in-pharmacology-publisher-frontiers" class="section level3">
 <h3>Articles from Frontiers in Pharmacology (publisher: Frontiers)</h3>
-
-<pre><code class="r">doi &lt;- &#39;10.3389/fphar.2014.00109&#39;
-ft_get(doi, from = &quot;entrez&quot;)
-#&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 1 
-#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 4050532 ...
-</code></pre>
-
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>doi &lt;-<span class="st"> &#39;10.3389/fphar.2014.00109&#39;</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">ft_get</span>(doi, <span class="dt">from =</span> <span class="st">&quot;entrez&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt; &lt;fulltext text&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt; [Docs] 1 </span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext </span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt; [IDs] 4050532 ...</span></span></code></pre></div>
+</div>
+</div>
+<div id="search-using-ft_search" class="section level2">
 <h2>Search using ft_search()</h2>
-
 <p>For example, search entrez, get some DOIs, then fetch some articles</p>
-
-<pre><code class="r">(res &lt;- ft_search(query = &#39;ecology&#39;, from = &#39;entrez&#39;))
-#&gt; Query:
-#&gt;   [ecology] 
-#&gt; Found:
-#&gt;   [PLoS: 0; BMC: 0; Crossref: 0; Entrez: 185437; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] 
-#&gt; Returned:
-#&gt;   [PLoS: 0; BMC: 0; Crossref: 0; Entrez: 10; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]
-res$entrez$data$doi
-#&gt;  [1] &quot;10.3748/wjg.v25.i45.6579&quot;    &quot;10.1038/s41467-019-13800-3&quot;  &quot;10.7554/eLife.49826&quot;         &quot;10.5365/wpsar.2018.9.5.005&quot;  &quot;10.1038/s41598-019-55147-1&quot; 
-#&gt;  [6] &quot;10.1038/s41598-019-54857-w&quot;  &quot;10.1038/s41598-019-55028-7&quot;  &quot;10.1038/s41598-019-55204-9&quot;  &quot;10.5423/PPJ.OA.05.2019.0129&quot; &quot;10.5423/PPJ.NT.08.2019.0216&quot;
-</code></pre>
-
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>(res &lt;-<span class="st"> </span><span class="kw">ft_search</span>(<span class="dt">query =</span> <span class="st">&#39;ecology&#39;</span>, <span class="dt">from =</span> <span class="st">&#39;entrez&#39;</span>))</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="co">#&gt; Query:</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt;   [ecology] </span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt; Found:</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="co">#&gt;   [PLoS: 0; BMC: 0; Crossref: 0; Entrez: 203062; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0] </span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; Returned:</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt;   [PLoS: 0; BMC: 0; Crossref: 0; Entrez: 10; arxiv: 0; biorxiv: 0; Europe PMC: 0; Scopus: 0; Microsoft: 0]</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a>res<span class="op">$</span>entrez<span class="op">$</span>data<span class="op">$</span>doi</span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt;  [1] &quot;10.1111/tesg.12439&quot;               &quot;10.1002/tie.22161&quot;               </span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt;  [3] &quot;10.1182/bloodadvances.2019001144&quot; &quot;10.1186/s13063-020-04513-w&quot;      </span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#&gt;  [5] &quot;10.1007/s10109-020-00330-6&quot;       &quot;10.3390/ma13112563&quot;              </span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="co">#&gt;  [7] &quot;10.3390/molecules25112618&quot;        &quot;10.3390/molecules25112634&quot;       </span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co">#&gt;  [9] &quot;10.3390/molecules25112471&quot;        &quot;10.1186/s40168-020-00861-6&quot;</span></span></code></pre></div>
 <p>Get articles</p>
-
-<pre><code class="r">ft_get(res$entrez$data$doi[1:3], from = &#39;entrez&#39;)
-#&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 3 
-#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 6906207 6904573 6904214 ...
-</code></pre>
-
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">ft_get</span>(res<span class="op">$</span>entrez<span class="op">$</span>data<span class="op">$</span>doi[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">from =</span> <span class="st">&#39;entrez&#39;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co">#&gt; &lt;fulltext text&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt; [Docs] 3 </span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext </span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt; [IDs] 7323205 7323122 7322952 ...</span></span></code></pre></div>
+</div>
+<div id="collect-full-text-from-file-on-disk" class="section level2">
 <h2>Collect full text from file on disk</h2>
-
-<p>When using <code>ft_get()</code> you write the files to disk, and you have to pull text out of them as a 
-separate step.</p>
-
-<pre><code class="r">(res &lt;- ft_get(&#39;10.1371/journal.pone.0086169&#39;, from = &#39;plos&#39;))
-#&gt; &lt;fulltext text&gt;
-#&gt; [Docs] 1 
-#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext 
-#&gt; [IDs] 10.1371/journal.pone.0086169 ...
-</code></pre>
-
+<p>When using <code>ft_get()</code> you write the files to disk, and you have to pull text out of them as a separate step.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>(res &lt;-<span class="st"> </span><span class="kw">ft_get</span>(<span class="st">&#39;10.1371/journal.pone.0086169&#39;</span>, <span class="dt">from =</span> <span class="st">&#39;plos&#39;</span>))</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="co">#&gt; &lt;fulltext text&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; [Docs] 1 </span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; [Source] ext - /Users/sckott/Library/Caches/R/fulltext </span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt; [IDs] 10.1371/journal.pone.0086169 ...</span></span></code></pre></div>
 <p>One way to do that is with <code>ft_collect()</code>. Before running <code>ft_collect()</code> the <code>data</code> slot is <code>NULL</code>.</p>
-
-<pre><code class="r">res$plos$data$data
-#&gt; NULL
-</code></pre>
-
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>res<span class="op">$</span>plos<span class="op">$</span>data<span class="op">$</span>data</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p>Run <code>ft_collect()</code></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>res &lt;-<span class="st"> </span>res <span class="op">%&gt;%</span><span class="st"> </span>ft_collect</span></code></pre></div>
+<p>After running <code>ft_collect()</code> the <code>data</code> slot has the text. If there’s more than one article they are named by the identifier</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>res<span class="op">$</span>plos<span class="op">$</span>data<span class="op">$</span>data</span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co">#&gt; $`10.1371/journal.pone.0086169`</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt; {xml_document}</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt; &lt;article article-type=&quot;research-article&quot; dtd-version=&quot;3.0&quot; lang=&quot;en&quot; xmlns:mml=&quot;http://www.w3.org/1998/Math/MathML&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="co">#&gt; [1] &lt;front&gt;\n  &lt;journal-meta&gt;\n    &lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt;PLoS  ...</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt; [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n    &lt;title&gt;Introduction&lt;/title&gt;\n    &lt;p&gt;Since th ...</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt; [3] &lt;back&gt;\n  &lt;ack&gt;\n    &lt;p&gt;We thank Joan Silk, Julienne Rutherford, and two  ...</span></span></code></pre></div>
+</div>
 
-<pre><code class="r">res &lt;- res %&gt;% ft_collect
-</code></pre>
 
-<p>After running <code>ft_collect()</code> the <code>data</code> slot has the text. If there&#39;s more than one article they are named
-by the identifier</p>
 
-<pre><code class="r">res$plos$data$data
-#&gt; $`10.1371/journal.pone.0086169`
-#&gt; {xml_document}
-#&gt; &lt;article article-type=&quot;research-article&quot; dtd-version=&quot;3.0&quot; lang=&quot;en&quot; xmlns:mml=&quot;http://www.w3.org/1998/Math/MathML&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
-#&gt; [1] &lt;front&gt;\n  &lt;journal-meta&gt;\n    &lt;journal-id journal-id-type=&quot;nlm-ta&quot;&gt;PLoS ONE&lt;/journal-id&gt;\n    &lt;journal-id journal-id-type=&quot;publisher-id&quot;&gt;plos&lt;/journal-id&gt;\n    &lt;journal-id j ...
-#&gt; [2] &lt;body&gt;\n  &lt;sec id=&quot;s1&quot;&gt;\n    &lt;title&gt;Introduction&lt;/title&gt;\n    &lt;p&gt;Since the 1970s, biologists have directed substantial research effort to understanding adaptive sex-biased al ...
-#&gt; [3] &lt;back&gt;\n  &lt;ack&gt;\n    &lt;p&gt;We thank Joan Silk, Julienne Rutherford, and two anonymous reviewers for their comments on earlier drafts of the manuscript.&lt;/p&gt;\n  &lt;/ack&gt;\n  &lt;ref-lis ...
-</code></pre>
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 </body>
-
 </html>

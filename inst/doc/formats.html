@@ -1,354 +1,438 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Information on article formats</title>
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<script type="text/javascript">
-window.onload = function() {
-  var imgs = document.getElementsByTagName('img'), i, img;
-  for (i = 0; i < imgs.length; i++) {
-    img = imgs[i];
-    // center an image if it is the only element of its parent
-    if (img.parentElement.childElementCount === 1)
-      img.parentElement.style.textAlign = 'center';
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Scott Chamberlain" />
+
+<meta name="date" content="2020-07-01" />
+
+<title>Article formats</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
   }
-};
+});
 </script>
 
 
 
 
 
-<style type="text/css">
-body, td {
-   font-family: sans-serif;
-   background-color: white;
-   font-size: 13px;
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
 }
-
-body {
-  max-width: 800px;
-  margin: auto;
-  padding: 1em;
-  line-height: 20px;
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
 }
-
-tt, code, pre {
-   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
 }
-
-h1 {
-   font-size:2.2em;
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
 }
-
-h2 {
-   font-size:1.8em;
+#TOC ul ul {
+margin-left: -2em;
 }
-
-h3 {
-   font-size:1.4em;
+#TOC li {
+line-height: 16px;
 }
-
-h4 {
-   font-size:1.0em;
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
 }
-
-h5 {
-   font-size:0.9em;
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
 }
-
-h6 {
-   font-size:0.8em;
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
 }
-
-a:visited {
-   color: rgb(50%, 0%, 50%);
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
 }
-
-pre, img {
-  max-width: 100%;
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
 }
 pre {
-  overflow-x: auto;
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
 }
-pre code {
-   display: block; padding: 0.5em;
+pre:not([class]) {
+background-color: #f7f7f7;
 }
-
 code {
-  font-size: 92%;
-  border: 1px solid #ccc;
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
 }
-
-code[class] {
-  background-color: #F8F8F8;
+p > code, li > code {
+padding: 2px 0px;
 }
-
-table, td, th {
-  border: none;
+div.figure {
+text-align: center;
 }
-
-blockquote {
-   color:#666666;
-   margin:0;
-   padding-left: 1em;
-   border-left: 0.5em #EEE solid;
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
 }
-
-hr {
-   height: 0px;
-   border-bottom: none;
-   border-top-width: thin;
-   border-top-style: dotted;
-   border-top-color: #999999;
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
 }
-
-@media print {
-   * {
-      background: transparent !important;
-      color: black !important;
-      filter:none !important;
-      -ms-filter: none !important;
-   }
-
-   body {
-      font-size:12pt;
-      max-width:100%;
-   }
-
-   a, a:visited {
-      text-decoration: underline;
-   }
-
-   hr {
-      visibility: hidden;
-      page-break-before: always;
-   }
-
-   pre, blockquote {
-      padding-right: 1em;
-      page-break-inside: avoid;
-   }
-
-   tr, img {
-      page-break-inside: avoid;
-   }
-
-   img {
-      max-width: 100% !important;
-   }
-
-   @page :left {
-      margin: 15mm 20mm 15mm 10mm;
-   }
-
-   @page :right {
-      margin: 15mm 10mm 15mm 20mm;
-   }
-
-   p, h2, h3 {
-      orphans: 3; widows: 3;
-   }
-
-   h2, h3 {
-      page-break-after: avoid;
-   }
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
 }
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
+
 
 
 
 </head>
 
 <body>
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Article formats}
-%\VignetteEncoding{UTF-8}
--->
 
+
+
+
+<h1 class="title toc-ignore">Article formats</h1>
+<h4 class="author">Scott Chamberlain</h4>
+<h4 class="date">2020-07-01</h4>
+
+
+
+<div id="information-on-article-formats" class="section level2">
 <h2>Information on article formats</h2>
-
 <p>There are various formats in which articles are provided by publishers, including pdf, plain text, xml, json, and more. The following is non-exhaustive table of formats provided by publisher or journal. Examples are included for each publisher if they support the format - click on the <code>Y</code> to get an example file.</p>
-
 <blockquote>
 <p>Note: many of these journals are also in PMC, where some formats are provided: PDF, ePub.</p>
 </blockquote>
-
-<table><thead>
-<tr>
+<table>
+<thead>
+<tr class="header">
 <th>Publisher</th>
 <th>pdf</th>
 <th>xml</th>
 <th>epub</th>
 <th>Notes</th>
 </tr>
-</thead><tbody>
-<tr>
+</thead>
+<tbody>
+<tr class="odd">
 <td>AIRCC</td>
 <td><a href="http://airccse.org/journal/cnc/7115cnc04.pdf">Y</a></td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>arXiv</td>
 <td><a href="http://arxiv.org/pdf/1507.08559v1.pdf?">Y</a></td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Bentham</td>
 <td><a href="http://benthamopen.com/contents/pdf/TONEUJ/TONEUJ-9-21.pdf">Y</a></td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>BiomedCentral</td>
 <td>Y</td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>bioRxiv</td>
 <td><a href="http://biorxiv.org/content/biorxiv/early/2015/07/26/023259.full.pdf">Y</a></td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>CogentOA</td>
 <td>Y</td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Copernicus</td>
 <td><a href="http://www.biogeosciences.net/11/7331/2014/bg-11-7331-2014.pdf">Y</a></td>
-<td><a href="http://www.biogeosciences.net/11/7331/2014/bg-11-7331-2014.xml">Y</a> <sup>[1]</sup></td>
+<td><a href="http://www.biogeosciences.net/11/7331/2014/bg-11-7331-2014.xml">Y</a> <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>De Gruyter</td>
 <td>Y</td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Dovepress</td>
 <td><a href="http://www.dovepress.com/getfile.php?fileID=24696">Y</a></td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>eLife</td>
 <td><a href="https://cdn.elifesciences.org/articles/31770/elife-31770-v1.pdf">Y</a></td>
 <td><a href="https://cdn.elifesciences.org/articles/31770/elife-31770-v1.xml">Y</a></td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>FrontiersIn</td>
 <td>Y</td>
-<td>Y <sup>[1]</sup></td>
+<td>Y <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></td>
 <td>Y</td>
 <td>ReadCube in browser</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Hindawi</td>
 <td><a href="http://downloads.hindawi.com/journals/crid/2014/246965.pdf">Y</a></td>
 <td><a href="http://downloads.hindawi.com/journals/tswj/2014/649260.xml">Y</a></td>
 <td><a href="http://downloads.hindawi.com/journals/crid/2014/246965.epub">Y</a></td>
-<td>Don&#39;t show XML link on page</td>
+<td>Don’t show XML link on page</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Karger</td>
 <td>Y</td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>MDPI</td>
 <td><a href="http://www.mdpi.com/1999-4915/7/8/2817/pdf">Y</a></td>
 <td>Y</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Nature</td>
 <td><a href="http://www.nature.com/articles/srep12550.pdf">Y</a></td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>PeerJ</td>
 <td><a href="https://peerj.com/articles/1142.pdf">Y</a></td>
 <td><a href="https://peerj.com/articles/1142.xml">Y</a></td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Pensoft</td>
 <td><a href="http://zookeys.pensoft.net/lib/ajax_srv/article_elements_srv.php?action=download_pdf&amp;item_id=4351">Y</a></td>
 <td><a href="http://zookeys.pensoft.net/lib/ajax_srv/article_elements_srv.php?action=download_xml&amp;item_id=4351">Y</a></td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>PLoS</td>
 <td><a href="http://www.plosone.org/article/fetchObject.action?uri=info%3Adoi%2F10.1371%2Fjournal.pone.0107510&amp;representation=PDF">Y</a></td>
-<td><a href="http://www.plosone.org/article/fetchObjectAttachment.action?uri=info%3Adoi%2F10.1371%2Fjournal.pone.0107510&amp;representation=XML">Y</a> <sup>[1]</sup></td>
+<td><a href="http://www.plosone.org/article/fetchObjectAttachment.action?uri=info%3Adoi%2F10.1371%2Fjournal.pone.0107510&amp;representation=XML">Y</a> <a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Sage</td>
 <td>Y</td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Scielo</td>
 <td><a href="http://www.scielo.br/pdf/cbab/v14n1/04.pdf">Y</a></td>
 <td><a href="http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S1984-70332014000100004&amp;lang=en">Y</a></td>
 <td>N</td>
 <td>May only be some journals</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>SERSC</td>
 <td>Y</td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Springer Open</td>
 <td>Y</td>
 <td>N</td>
 <td>N</td>
-<td>&hellip;</td>
+<td>…</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+<p>^1: NLM-DTD XML schema - <a href="http://dtd.nlm.nih.gov/" class="uri">http://dtd.nlm.nih.gov/</a> ^2: Wiley and Elsevier do have a few open access journals each, which provide PDFs, but no XML. Elsevier has text mining web services but they are so painful to use that we will not support it here. Do put pressure on these two enormous publishers to give XML of articles, at least for their open access journals.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>1<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>1<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>1<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
 
-<p><sup>1:</sup> NLM-DTD XML schema - <a href="http://dtd.nlm.nih.gov/">http://dtd.nlm.nih.gov/</a>
-<sup>2:</sup> Wiley and Elsevier do have a few open access journals each,
-which provide PDFs, but no XML. Elsevier has text mining web services
-but they are so painful to use that we will not support it here. Do
-put pressure on these two enormous publishers to give XML of articles, at
-least for their open access journals.</p>
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 </body>
-
 </html>

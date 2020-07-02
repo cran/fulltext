@@ -3,14 +3,16 @@ context("ft_abstract")
 test_that("ft_abstract basic functionality works - PLOS", {
   skip_on_cran()
   
-  res <- ft_search(query = 'biology', from = 'plos', limit = 20, 
-     plosopts = list(fq = list('doc_type:full', '-article_type:correction',
-                    '-article_type:viewpoints')))
-  dois <- res$plos$data$id
-  aa <- ft_abstract(x = dois[1:5], from = "plos")
+  vcr::use_cassette("ft_abstract_plos", {
+    res <- ft_search(query = 'biology', from = 'plos', limit = 20, 
+       plosopts = list(fq = list('doc_type:full', '-article_type:correction',
+                      '-article_type:viewpoints')))
+    dois <- res$plos$data$id
+    aa <- ft_abstract(x = dois[1:5], from = "plos")
+  }, preserve_exact_body_bytes = TRUE)
   
   expect_is(aa, "ft_abstract")
-  expect_named(aa, c('plos', 'scopus', 'ma', 'crossref'))
+  expect_named(aa, c('plos', 'scopus', 'ma', 'crossref', 'semanticscholar'))
   expect_is(aa$plos, "list")
   expect_is(aa$plos[[1]], "list")
   expect_named(aa$plos[[1]], c('doi', 'abstract'))
@@ -64,13 +66,15 @@ test_that("ft_abstract basic functionality works - PLOS", {
 test_that("ft_abstract basic functionality works - Crossref", {
   skip_on_cran()
   
-  res <- ft_search("ecology", from = "crossref", 
-    crossrefopts = list(filter = c(has_abstract = TRUE)))
-  ids <- res$crossref$data$doi
-  aa <- ft_abstract(x = ids, from = "crossref")
+  vcr::use_cassette("ft_abstract_crossref", {
+    res <- ft_search("ecology", from = "crossref", 
+      crossrefopts = list(filter = c(has_abstract = TRUE)))
+    ids <- res$crossref$data$doi
+    aa <- ft_abstract(x = ids, from = "crossref")
+  })
   
   expect_is(aa, "ft_abstract")
-  expect_named(aa, c('plos', 'scopus', 'ma', 'crossref'))
+  expect_named(aa, c('plos', 'scopus', 'ma', 'crossref', 'semanticscholar'))
   expect_is(aa$crossref, "list")
   expect_is(aa$crossref[[1]], "list")
   expect_named(aa$crossref[[1]], c('id', 'abstract'))

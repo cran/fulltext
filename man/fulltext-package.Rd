@@ -76,6 +76,11 @@ number of requests per some time period. The numbers can change so we
 can't give a rate limit that will always be in effect. If you're curious
 pass in \code{verbose = TRUE} to your function call, and you'll get headers
 that will display these rate limits. See also \strong{Authentication}.
+
+\strong{Semantic Scholar}: Not documented in their docs, and no response
+headers given. At time of this writing (2020-07-01) the rate limit is:
+100 requests per 5-minutes per IP address. or 20 requests per min. Note
+that this rate limit may change.
 }
 
 \section{Authentication}{
@@ -97,8 +102,23 @@ we'll read it in for you. See \link{Startup} for help. For the institution acces
 go to a browser and see if you have access to the journal(s) you want.
 If you don't have access in a browser you probably won't have access via
 this package. If you aren't physically at your institution you will likely
-need to be on a VPN or similar so that your IP address is in the range
+need to be on a VPN or similar and eventually require correct proxy settings,
+so that your IP address is in the range
 that the two publishers are accepting for that institution.
+It might be, that the API access seems to work even while
+in the wrong IP range or have wrong proxy settings,
+but you are not able to see the abstracts, they will be empty.
+By using the currect curl options into the calls to ft_search or ft_abstracts even
+the most complex proxy including authentication should work. As an example:
+
+\preformatted{
+opts <- list(key="your-scopus-key")
+ft_abstract(x = dois, from = "scopus", scopusopts = opts,
+  proxy="proxy-ip-address",
+  proxyport=your-proxy-port,
+  proxyuserpwd="username:password", # often the same as your windows login
+  proxyauth=8) # ntlm - authentication
+}
 
 \strong{ScienceDirect}: Elsevier ScienceDirect requires two things: an API key
 and your institution must have access. For the API key,
