@@ -7,7 +7,7 @@ Description: Provides a single interface to many sources of full text
     included for searching for articles, downloading full or partial
     text, downloading supplementary materials, converting to various
     data formats.
-Version: 1.5.0
+Version: 1.6.0
 License: MIT + file LICENSE
 Authors@R: c(
     person("Scott", "Chamberlain",
@@ -18,29 +18,28 @@ Authors@R: c(
         role = "fnd",
         comment = "https://ropensci.org/")
     )
-URL: https://docs.ropensci.org/fulltext (website)
+URL: https://docs.ropensci.org/fulltext/ (website)
         https://github.com/ropensci/fulltext/ (devel)
         https://books.ropensci.org/fulltext/ (user manual)
 BugReports: https://github.com/ropensci/fulltext/issues
 LazyLoad: yes
 Encoding: UTF-8
 Language: en-US
-VignetteBuilder: knitr
+Depends: R (>= 2.10)
 Imports: crul (>= 0.7.0), magrittr, xml2 (>= 1.1.1), jsonlite, rplos
         (>= 0.8.0), rcrossref (>= 0.8.0), crminer (>= 0.2.0),
         microdemic (>= 0.2.0), aRxiv, rentrez (>= 1.1.0), data.table,
-        hoardr (>= 0.5.0), pdftools, storr, tibble, digest
-Suggests: roxygen2 (>= 7.1.0), testthat, knitr, rmarkdown, pubchunks,
-        vcr
-RoxygenNote: 7.1.0
+        hoardr (>= 0.5.0), pdftools, storr, tibble, digest, fauxpas
+Suggests: roxygen2 (>= 7.1.0), testthat, pubchunks, vcr
+RoxygenNote: 7.1.1
 X-schema.org-applicationCategory: Literature
 X-schema.org-keywords: text-mining, literature, pdf, xml, publications,
         citations, full-text, TDM
 X-schema.org-isPartOf: https://ropensci.org
 NeedsCompilation: no
-Packaged: 2020-07-02 05:10:05 UTC; sckott
+Packaged: 2020-10-19 17:28:49 UTC; sckott
 Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>),
   rOpenSci [fnd] (https://ropensci.org/)
 Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-07-02 05:30:07 UTC
+Date/Publication: 2020-10-19 17:50:03 UTC

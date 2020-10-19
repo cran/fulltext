@@ -10,7 +10,6 @@ ft_get(
   from = NULL,
   type = "xml",
   try_unknown = TRUE,
-  plosopts = list(),
   bmcopts = list(),
   entrezopts = list(),
   elifeopts = list(),
@@ -37,12 +36,10 @@ structure that a machine can reason about, but you are of course free to try
 to get xml, pdf, or plain (in the case of Elsevier and ScienceDirect).}
 
 \item{try_unknown}{(logical) if publisher plugin not already known, we try
-to fetch full text link either from ftdoi.org or from Crossref. If not
-found at ftdoi.org or at Crossref we skip with a warning. If found with
-ftdoi.org or Crossref we attempt to download. Only applicable in
-\code{character} and \code{list} S3 methods. Default: \code{TRUE}}
-
-\item{plosopts}{PLOS options, a named list. See \code{\link[rplos:plos_fulltext]{rplos::plos_fulltext()}}}
+to fetch full text link either using \pkg{ftdoi} package or from Crossref.
+If not found at \pkg{ftdoi} or at Crossref we skip with a warning.
+If found with \pkg{ftdoi} or Crossref we attempt to download. Only
+applicable in \code{character} and \code{list} S3 methods. Default: \code{TRUE}}
 
 \item{bmcopts}{BMC options. parameter DEPRECATED}
 
@@ -255,7 +252,7 @@ ft_get('10.7717/peerj.228', type = "pdf")
 ### xml
 ft_get('10.7554/eLife.03032')
 res <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'),
-from = "elife")
+  from = "elife")
 res$elife
 respdf <- ft_get(c('10.7554/eLife.03032', '10.7554/eLife.32763'),
   from = "elife", type = "pdf")
@@ -295,6 +292,10 @@ res <- ft_get(c('10.1155/2014/292109', '10.12688/f1000research.6522.1'))
 res$hindawi
 res$f1000research
 
+## Thieme -
+### coverage is hit and miss, it's not great
+ft_get('10.1055/s-0032-1316462')
+
 ## Pensoft
 ft_get('10.3897/mycokeys.22.12528')
 
@@ -310,6 +311,15 @@ res \%>\% ft_extract  \%>\% .$arxiv
 ## bioRxiv - only pdf
 res <- ft_get(x='10.1101/012476')
 res$biorxiv
+
+## AAAS - only pdf
+res <- ft_get(x='10.1126/science.276.5312.548')
+res$aaas
+
+# The Royal Society
+res <- ft_get("10.1098/rspa.2007.1849")
+ft_get(c("10.1098/rspa.2007.1849", "10.1098/rstb.1970.0037",
+  "10.1098/rsif.2006.0142"))
 
 ## Karger Publisher
 (x <- ft_get('10.1159/000369331'))
@@ -337,8 +347,8 @@ library(rplos)
 (dois <- searchplos(q="*:*", fl='id',
    fq=list('doc_type:full',"article_type:\"research article\""),
    limit=5)$data$id)
-ft_get(dois, from='plos')
-ft_get(c('10.7717/peerj.228','10.7717/peerj.234'), from='entrez')
+ft_get(dois)
+ft_get(c('10.7717/peerj.228','10.7717/peerj.234'))
 
 # elife
 ft_get('10.7554/eLife.04300', from='elife')
@@ -353,13 +363,7 @@ ft_get(doi, from="entrez")
 
 # Hindawi Journals
 ft_get(c('10.1155/2014/292109','10.1155/2014/162024','10.1155/2014/249309'),
-from='entrez')
-res <- ft_search(query='ecology', from='crossref', limit=20,
-                 crossrefopts = list(filter=list(has_full_text = TRUE,
-                                                 member=98,
-                                                 type='journal-article')))
-
-out <- ft_get(res$crossref$data$doi[1:3])
+  from='entrez')
 
 # Frontiers Publisher - Frontiers in Aging Nueroscience
 res <- ft_get("10.3389/fnagi.2014.00130", from='entrez')
@@ -421,10 +425,14 @@ ft_get('10.1063/1.4895527')
 # American Chemical Society
 ft_get(c('10.1021/la903074z', '10.1021/jp048806z'))
 
+# Royal Society of Chemistry
+ft_get('10.1039/c8cc06410e')
+
 
 # From ft_links output
 ## Crossref
-(res2 <- ft_search(query = 'ecology', from = 'crossref', limit = 3))
+(res2 <- ft_search(query = 'ecology', from = 'crossref', limit = 3,
+  crossrefopts = list(filter = list(has_full_text=TRUE, member=98))))
 (out <- ft_links(res2))
 (ress <- ft_get(x = out, type = "pdf"))
 ress$crossref
@@ -432,23 +440,11 @@ ress$crossref
 (x <- ft_links("10.1111/2041-210X.12656", "crossref"))
 (y <- ft_get(x))
 
-## PLOS
-(res2 <- ft_search(query = 'ecology', from = 'plos', limit = 4))
-(out <- ft_links(res2))
-out$plos
-(ress <- ft_get(x = out, type = "pdf"))
-ress$plos
-ress$plos$dois
-ress$plos$data
-ress$plos$data$path$`10.1371/journal.pone.0059813`
-
 ## Cambridge
 x <- ft_get("10.1017/s0922156598230305")
 x$cambridge
 z <- ft_get("10.1017/jmo.2019.20")
 z$cambridge
-w <- ft_get("10.1017/jmo.2019.20")
-w$cambridge
 m <- ft_get("10.1017/S0266467419000270")
 m$cambridge
 
@@ -464,15 +460,15 @@ library(rplos)
    fq=list('doc_type:full',"article_type:\"research article\""),
    limit=5)$data$id)
 ## when articles not already downloaded you see the progress bar
-b <- ft_get(dois, from='plos', progress = TRUE)
+b <- ft_get(dois, progress = TRUE)
 ## if articles already downloaded/cached, normally we through messages
 ## saying so
-b <- ft_get(dois, from='plos', progress = FALSE)
+b <- ft_get(dois, progress = FALSE)
 ## but if a progress bar is requested, then the messages are suppressed
-b <- ft_get(dois, from='plos', progress = TRUE)
+b <- ft_get(dois, progress = TRUE)
 
 # curl options
-ft_get("10.1371/journal.pcbi.1002487", from = "plos", verbose = TRUE)
+ft_get("10.1371/journal.pcbi.1002487", verbose = TRUE)
 ft_get('10.3897/mycokeys.22.12528', from = "pensoft", verbose = TRUE)
 }
 }

@@ -27,7 +27,7 @@
 #' desired. Note that these subject code mapping vary based upon the
 #' environment in which the request is executed. See Details for choices.
 #' @param key (character) api key. get a key at
-#' <https://dev.elsevier.com/index.html>
+#' https://dev.elsevier.com/index.html
 #' @param ... curl options passed on to [crul::HttpClient]
 #'
 #' @details Rate limits for search are 20,000 per every 7 days. You likely
@@ -35,10 +35,10 @@
 #' 5 days, then you have to wait 2 days for the clock to reset, than you'll
 #' be able to make 20K again.
 #'
-#' See <https://dev.elsevier.com/api_key_settings.html> for rate
+#' See https://dev.elsevier.com/api_key_settings.html for rate
 #' limit information.
 #'
-#' See <https://dev.elsevier.com/tips/ScopusSearchTips.htm> for help/tips
+#' See https://dev.elsevier.com/sc_search_tips.html for help/tips
 #' on searching
 #'
 #' @section subj choices include:
@@ -82,27 +82,27 @@
 #'
 #' # using facets
 #' ## scopus_search
-#' res <- scopus_search(query = "ecology", facets = "subjarea(count=5)")
-#' res
-#' res$`search-results`$link
-#' res$`search-results`$entry
-#' res$`search-results`$facet
+#' # res <- scopus_search(query = "ecology", facets = "subjarea(count=5)")
+#' # res
+#' # res$`search-results`$link
+#' # res$`search-results`$entry
+#' # res$`search-results`$facet
 #'
 #' ## more examples
-#' x <- scopus_search(query = "ecology", facets = "language(count=4)",
-#'   count = 1)
-#' x$`search-results`$facet
-#' x <- scopus_search(query = "ecology",
-#'   facets = "pubyear(count=3);doctype();language(count=4)")
-#' x$`search-results`$facet
+#' # x <- scopus_search(query = "ecology", facets = "language(count=4)",
+#' #   count = 1)
+#' # x$`search-results`$facet
+#' # x <- scopus_search(query = "ecology",
+#' #   facets = "pubyear(count=3);doctype();language(count=4)")
+#' # x$`search-results`$facet
 #'
 #' ## scopus_search_loop
-#' res <- scopus_search_loop(query = "ecology", facets = "subjarea(count=5)",
-#'   count = 200)
-#' res$found
-#' head(res$results)
-#' NROW(res$results)
-#' res$facets
+#' # res <- scopus_search_loop(query = "ecology", facets = "subjarea(count=5)",
+#' #   count = 200)
+#' # res$found
+#' # head(res$results)
+#' # NROW(res$results)
+#' # res$facets
 #'
 #' # sort
 #' x <- scopus_search(query = "ecology", sort = "-title")
