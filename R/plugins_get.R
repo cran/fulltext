@@ -67,7 +67,7 @@ get_ft <- function(x, type, url, path, headers = list(), ...) {
   )
   #cat(paste0("within get_ft: ", cli$url), sep="\n")
   res <- tryCatch(cli$get(disk = path), 
-    error = function(e) e, 
+    error = function(e) e,
     warning = function(w) w)
   #cat(class(res)[1L], sep = "\n")
 
@@ -106,6 +106,11 @@ get_ft <- function(x, type, url, path, headers = list(), ...) {
     } else {
       # if all else fails just give a HTTP status code message back
       http_mssg(res)
+    }
+    if ("url" %in% names(res)) {
+      if (grepl("wiley", res$url, ignore.case = TRUE)) {
+        mssg <- paste(mssg, res$response_headers$status, sep = " & ")
+      }
     }
     warning("you may not have access to ", x, 
       "\n or an error occurred", 
@@ -182,8 +187,6 @@ plugin_get_peerj <- plugin_get_generator("peerj", peerj_ft)
 plugin_get_frontiersin <- plugin_get_generator("frontiersin", frontiersin_ft)
 plugin_get_pensoft <- plugin_get_generator("pensoft", pensoft_ft)
 plugin_get_copernicus <- plugin_get_generator("copernicus", copernicus_ft)
-# plugin_get_cogent <- plugin_get_generator("cogent", cogent_ft)
-#plugin_get_crossref <- plugin_get_generator("crossref", crminer::crm_xml)
 plugin_get_entrez <- plugin_get_generator("entrez", entrez_ft)
 plugin_get_biorxiv <- plugin_get_generator("biorxiv", biorxiv_ft)
 plugin_get_arxiv <- plugin_get_generator("arxiv", arxiv_ft)
@@ -207,6 +210,7 @@ plugin_get_aip <- plugin_get_generator("aip", aip_ft)
 plugin_get_cambridge <- plugin_get_generator("cambridge", cambridge_ft)
 plugin_get_cob <- plugin_get_generator("cob", cob_ft)
 plugin_get_roysoc <- plugin_get_generator("roysoc", roysoc_ft)
+plugin_get_transtech <- plugin_get_generator("transtech", transtech_ft)
 
 # lapply replacement with progress bar: actual a for loop internally
 plapply <- function(x, FUN, type = NULL, progress = FALSE, ...) {
@@ -331,7 +335,7 @@ elife_ft <- function(dois, type, progress = FALSE, ...) {
       if (!progress) message(paste0("path exists: ", path))
       return(ft_object(path, x, type))
     }
-    lk <- tcat(crminer::crm_links(x))
+    lk <- tcat(ft_cr_links(x))
     if (inherits(lk, "error")) return(ft_error(lk$message, x))
     lk <- tcat(Filter(function(x) grepl(paste0("\\.", type), x), lk)[[1]][[1]])
     get_ft(x, type, lk, path, list(), ...)
@@ -442,6 +446,7 @@ biorxiv_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
 
 # type: plain and xml
 elsevier_ft <- function(dois, type, progress = FALSE, retain_non_ft = FALSE, ...) {
+  warn_crossref_tdm()
   assert(retain_non_ft, "logical")
   type_in(type, c('plain', 'xml', 'pdf'), "elsevier")
   elsevier_fun <- function(x, type, progress, ...) {
@@ -454,13 +459,14 @@ elsevier_ft <- function(dois, type, progress = FALSE, retain_non_ft = FALSE, ...
     if (inherits(res, c("error", "warning"))) return(ft_error(res$message, x))
     res <- res$data$link[[1]]
     url <- res[res$content.type == paste0("text/", type), "URL"][[1]]
-    if (is.null(url)) {
+    if (is.null(url) || length(url) == 0) {
       mssg <- "has no link available"
-      warning(x, " ", mssg, call. = FALSE)
+      warning(x, " with type '", type, "' ", mssg, call. = FALSE)
       return(ft_error(mssg, x))
     }
     header <- list(
-      `CR-Clickthrough-Client-Token` = Sys.getenv("CROSSREF_TDM"),
+      # See https://dev.elsevier.com/tecdoc_text_mining.html
+      `X-ELS-APIKey` = Sys.getenv("ELSEVIER_TDM_KEY"),
       Accept = paste0(switch(type, xml = "text/", plain = "text/"), type)
     )
     get_ft(x, type, url, path, header, ...)
@@ -517,6 +523,7 @@ sciencedirect_ft <- function(dois, type, progress = FALSE, ...) {
 
 # type: pdf and xml
 wiley_ft <- function(dois, type, progress = FALSE, ...) {
+  warn_crossref_tdm()
   type_in(type, c('pdf', 'xml'), "wiley")
   wiley_fun <- function(x, type, progress, ...) {
     path <- make_key(x, type)
@@ -532,7 +539,8 @@ wiley_ft <- function(dois, type, progress = FALSE, ...) {
         sub("/", "%2F", x))
     }
     header <- list(
-      `CR-Clickthrough-Client-Token` = Sys.getenv("CROSSREF_TDM"),
+      # See https://onlinelibrary.wiley.com/library-info/resources/text-and-datamining
+      `Wiley-TDM-Client-Token` = Sys.getenv("WILEY_TDM_KEY"),
       Accept = paste0(switch(type, xml = "application/", pdf = "application/"), type)
     )
     suppressWarnings(get_ft(x, type, url, path, header, ...))
@@ -549,7 +557,7 @@ scientificsocieties_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
       return(ft_object(path, x, 'pdf'))
     }
 
-    lk <- tryCatch(crminer::crm_links(x), error = function(e) e, 
+    lk <- tryCatch(ft_cr_links(x), error = function(e) e, 
       warning = function(w) w)
     if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
     if (is.null(lk) || length(lk) == 0) {
@@ -571,7 +579,7 @@ informa_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
       return(ft_object(path, x, 'pdf'))
     }
 
-    lk <- tryCatch(crminer::crm_links(x), error = function(e) e, warning = function(w) w)
+    lk <- tryCatch(ft_cr_links(x), error = function(e) e, warning = function(w) w)
     if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
     if (is.null(lk) || length(lk) == 0) {
       mssg <- "has no link available"
@@ -608,7 +616,7 @@ ieee_ft <- function(dois, type = "pdf",progress = FALSE, ...) {
       return(ft_object(path, x, 'pdf'))
     }
 
-    lk <- tryCatch(crminer::crm_links(x), error = function(e) e, warning = function(w) w)
+    lk <- tryCatch(ft_cr_links(x), error = function(e) e, warning = function(w) w)
     if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
     if (is.null(lk) || length(lk) == 0) {
       mssg <- "has no link available"
@@ -748,7 +756,7 @@ instinvestfil_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
       return(ft_object(path, x, 'pdf'))
     }
 
-    lk <- tryCatch(crminer::crm_links(x), error = function(e) e, warning = function(w) w)
+    lk <- tryCatch(ft_cr_links(x), error = function(e) e, warning = function(w) w)
     if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
     if (is.null(lk) || length(lk) == 0) {
       mssg <- "has no link available"
@@ -821,10 +829,28 @@ cob_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
   plapply(dois, cob_fun, type, progress, ...)
 }
 
+# Trans Tech Publications
+# type: only pdf (type parameter is ignored)
+transtech_ft <- function(dois, type = "pdf", progress = FALSE, ...) {
+  tt_fun <- function(x, type, progress, ...) {
+    path <- make_key(x, 'pdf')
+    if (file.exists(path) && !cache_options_get()$overwrite) {
+      if (!progress) message(paste0("path exists: ", path))
+      return(ft_object(path, x, 'pdf'))
+    }
+    # ftdoi_get(member = names(dfsplit)[i])
+    lk <- tcat(ftd_doi(x))
+    if (inherits(lk, c("error", "warning"))) return(ft_error(lk$message, x))
+    url <- lk[grepl("pdf", lk$content_type), ]$url
+    get_ft(x = x, type = 'pdf', url = url, path = path, ...)
+  }
+  plapply(dois, tt_fun, type, progress, ...)
+}
+
 # special Crossref plugin to try any DOI
 crossref_ft <- function(dois, type, progress = FALSE, ...) {
   crossref_fun <- function(x, type, progress, ...) {
-    lks <- tcat(crminer::crm_links(x))
+    lks <- tcat(ft_cr_links(x))
     if (inherits(lks, c("error", "warning")) || inherits(lks, "warning")) {
       mssg <- lks$message
       if (inherits(lks, "error")) warning(x, " has no full text links available", call. = FALSE)
@@ -883,4 +909,12 @@ got_link_ft <- function(dois, type, url_pattern, progress = FALSE, ...) {
     get_ft(x, type, url, path, ...)
   }
   plapply(dois, link_fun, type, progress, ...)
+}
+
+warn_crossref_tdm <- function(x) {
+  crtdm <- 'CROSSREF_TDM'
+  if (nzchar(Sys.getenv(crtdm)))
+    warning(sprintf(
+      "`%s` env var found: see 'Authentication' section of ?fulltext",
+      crtdm), call. = FALSE)
 }

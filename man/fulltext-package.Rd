@@ -120,19 +120,34 @@ ft_abstract(x = dois, from = "scopus", scopusopts = opts,
   proxyauth=8) # ntlm - authentication
 }
 
-\strong{ScienceDirect}: Elsevier ScienceDirect requires two things: an API key
-and your institution must have access. For the API key,
+\strong{Elsevier/ScienceDirect}: Elsevier ScienceDirect requires two things: an
+API key and your institution must have access. For the API key,
 go to https://dev.elsevier.com/index.html,
 register for an account, then when you're in your account, create an API key
 that is allowed to access the TDM API (must accept their TDM policy).
-Pass in as variable \code{key} to \code{sciencedirectopts}, or store your key under the name
-\code{ELSEVIER_TDM_KEY} as an environment variable in \code{.Renviron}, and
-we'll read it in for you. See \link{Startup} for help. For the institution access
+Pass in as variable \code{key} to \code{elsevieropts}/\code{sciencedirectopts}, or store
+your key under the name \code{ELSEVIER_TDM_KEY} as an environment variable in
+\code{.Renviron}, and we'll read it in for you. See \link{Startup} for help. For
+the institution access
 go to a browser and see if you have access to the journal(s) you want.
 If you don't have access in a browser you probably won't have access via
 this package. If you aren't physically at your institution you will likely
 need to be on a VPN or similar so that your IP address is in the range
 that the publisher is accepting for that institution.
+
+\strong{Wiley}: Replacing Crossref TDM service as of February 2021, Wiley
+now requires you get a Wiley TDM key. Get one at
+https://onlinelibrary.wiley.com/library-info/resources/text-and-datamining
+Pass in as variable \code{key} to \code{wileyopts}, or preferably store
+your key under the name \code{WILEY_TDM_KEY} as an environment variable in
+\code{.Renviron}, and we'll read it in for you. See \link{Startup} for help. Some
+notes about Wiley's TDM service:
+\itemize{
+\item They always respond initially with a redirect to a server dedicated to
+the serving of binary resources - fulltext takes care of this
+\item Wiley uses rate-limiting: no more than 3 requests per second. you
+may get 429 errors if making too requests too rapidly
+}
 
 \strong{Microsoft}: Get a key by creating an Azure account
 then request a key for \strong{Academic Knowledge API} within
@@ -143,36 +158,23 @@ API key into \code{maopts} as a named element in a list like
 
 \strong{Crossref}: Crossref encourages requests with contact information
 (an email address) and will forward you to a dedicated API cluster
-for improved performance when you share your email address with them.
+for improved performance when you share your email address with them. This
+is called the "Polite Pool".
 https://github.com/CrossRef/rest-api-doc#good-manners--more-reliable-service
 To pass your email address to Crossref via this client, store it
 as an environment variable in \code{.Renviron} like
-\code{crossref_email = name@example.com}
+\code{crossref_email=name@example.com}, or \code{CROSSREF_EMAIL=name@example.com}.
+Save the file and restart your R session. To stop sharing your email when
+using rcrossref simply delete it from your \code{.Renviron} file OR to temporarily
+not use your email unset it for the session
+like \code{Sys.unsetenv('crossref_email')}. To be sure your in the polite pool
+use curl verbose by e.g., \code{ft_cr_links(doi = "10.5555/515151", verbose = TRUE)}
 
-\strong{Crossref TDM}: TDM = "Text and Data Mining". This applies to the few
-publishers - Wiley and Elsevier - that are part of this program (TDM).
-When using \code{\link[=ft_get]{ft_get()}}, and you want to get papers from these two publishers,
-you'll need two things:
-(1) an API key for the Crossref TDM. Go to
-https://apps.crossref.org/clickthrough/researchers and you'll be asked to
-login with your ORCID. If you don't have an ORCID go to https://orcid.org/
-and get one. After logging in with your ORCID, click on the "API token"
-tag and grab your API key. Put your API key in \code{.Renviron} file or similar
-(e.g. \code{.zshrc} or \code{.bash_profile}, etc.) with the entry
-\code{CROSSREF_TDM=yourkey}. We'll look for the environment variable CROSSREF_TDM
-within this package. See http://tdmsupport.crossref.org/ for more
-information on the Crossref TDM program.
-(2) Your institution needs to have access to the journal you're requesting
-papers from. If you're not sure about this just go to a browser and see if you
-have access to the journal(s) you want. If you don't have access in a browser
-you probably won't have access via this package. If you aren't physically at
-your institution you will likely need to be on a VPN or similar so that
-your IP address is in the range that the two publishers are accepting for
-that institution. Also talk to your librarian if you aren't sure about
-access or have questions about it. In some cases, you may also need to request
-that Elsevier removes a "fence" for your institution - that is, your institution
-has access to XYZ journal(s), but they don't yet allow programmatic access.
-This has happened at least a few times that I know of.
+\strong{Crossref TDM}: TDM = "Text and Data Mining". This used to apply to just
+two publishers - Wiley and Elsevier - This service officially shut down at
+the end of 2020. For Elsevier, see the
+"Elsevier/ScienceDirect" section above. For Wiley, see the "Wiley" section
+above.
 
 \strong{Entrez}: NCBI limits users to making only 3 requests per second. But, users
 who register for an API key are able to make up to ten requests per second.
@@ -188,7 +190,7 @@ used across R sessions.
 No authentication needed for \strong{PLOS}, \strong{eLife}, \strong{arxiv}, \strong{biorxiv},
 \strong{Euro PMC}
 
-Let us know if you run into trouble with authentication.
+Open an issue if you run into trouble with authentication.
 }
 
 \section{Feedback}{

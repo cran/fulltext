@@ -104,15 +104,12 @@
 #' [fulltext-package] for rate limiting and authentication information,
 #' respectively.
 #'
-#' In particular, take note that when fetching full text from Wiley and
-#' Elsevier, the only way that's done (unless it's one of their OA papers)
-#' is through the Crossref TDM flow in which you need a Crossref TDM API
-#' key and your institution needs to have access to the exact journal you
-#' are trying to fetch a paper from. If your institution doesn't have
-#' access you may still get a result, but likely its only the abstract.
-#' Pretty much the same is true when fetching from ScienceDirect directly.
-#' You need to have an Elsevier API key
-#' that is valid for their TDM/article API.
+#' In particular, take note that when fetching full text from Wiley, the only
+#' way that's done is through the Crossref Text and Data Mining service. See
+#' the Authenticaiton section of [fulltext-package] for all the details.
+#' 
+#' When fetching articles from Elsevier, the only way that used to be done
+#' was through the Crossref TDM flow. However, Crossref TDM is going away.
 #' See **Authentication** in [fulltext-package] for details.
 #'
 #' @section Notes on the `type` parameter:
@@ -326,7 +323,7 @@
 #' ft_get(res)
 #'
 #' # elsevier, ugh
-#' ## set an environment variable like Sys.setenv(CROSSREF_TDM = "your key")
+#' ## set the environment variable Sys.setenv(ELSEVIER_TDM_KEY = "your key")
 #' ### an open access article
 #' ft_get(x = "10.1016/j.trac.2016.01.027", from = "elsevier")
 #' ### non open access article
@@ -339,13 +336,15 @@
 #'   elsevieropts = list(retain_non_ft = TRUE))
 #'
 #' # sciencedirect
-#' ## set an environment variable like Sys.setenv(ELSEVIER_TDM_KEY = "your key")
+#' ## set the environment variable Sys.setenv(ELSEVIER_TDM_KEY = "your key")
 #' ft_get(x = "10.1016/S0140-6736(13)62329-6", from = "sciencedirect")
 #'
 #' # wiley, ugh
+#' ## set the environment variable Sys.setenv(WILEY_TDM_KEY = "your key")
 #' ft_get(x = "10.1006/asle.2001.0035", from = "wiley", type = "pdf")
 #' ## xml
 #' ft_get(x = "10.1111/evo.13812", from = "wiley")
+#' 
 #' ## highwire fiasco paper
 #' ft_get(x = "10.3732/ajb.1300053", from = "wiley")
 #' ft_get(x = "10.3732/ajb.1300053", from = "wiley", type = "pdf")
@@ -571,10 +570,6 @@ ft_get_ls <- function() {
   gsub("plugin_get_", "", nms)
 }
 
-
-
-
-
 #' @export
 print.ft_data <- function(x, ...) {
   cat("<fulltext text>", sep = "\n")
@@ -709,7 +704,8 @@ publisher_plugin <- function(x) {
     `317` = plugin_get_aip,
     `56` = plugin_get_cambridge,
     `237` = plugin_get_cob,
-    `175` = plugin_get_roysoc
+    `175` = plugin_get_roysoc,
+    `2457` = plugin_get_transtech
   )
 }
 
@@ -748,6 +744,7 @@ get_pub_name <- function(x) {
          `56` = "cambridge",
          `237` = "cob",
          `175` = "roysoc",
+         `2457` = "transtech",
          "crossref"
   )
 }
@@ -784,6 +781,7 @@ get_tm_name <- function(x) {
          `56` = "cambridge",
          `237` = "cob",
          `175` = "roysoc",
+         `2457` = "transtech",
          "crossref"
   )
 }
@@ -811,7 +809,7 @@ get_publisher <- function(x, ...) {
 fat_cat_search_one <- function(dois, fields, size) {
   search_string <- make_doi_str(dois)
   cn <- crul::HttpClient$new("https://search.fatcat.wiki")
-  query <- list(q = search_string, `_source` = paste0(fields, collapse = ","),
+  query <- list(q = search_string, `_source_includes` = paste0(fields, collapse = ","),
     size = size)
   res <- cn$get("fatcat_release/_search", query = query)
   res$raise_for_status()
