@@ -1,5 +1,5 @@
 skip_on_cran()
-skip_if_crossref_api_down()
+skip_on_ci()
 
 # delate any cached files, start over for tests
 ftdoi_cache$delete_all()
@@ -7,6 +7,7 @@ ftdoi_cache$delete_all()
 context("ftd_doi")
 
 test_that("ftd_doi: karger", {
+  skip_if_crossref_api_down()
   # dois_karger=rcrossref::cr_members(127, works=TRUE, limit=5)$data$doi
   # save(dois_karger, file="tests/testthat/dois/dois_karger.rda", version=2)
   load("dois/dois_karger.rda")
@@ -20,6 +21,7 @@ test_that("ftd_doi: karger", {
 })
 
 test_that("ftd_doi: pensoft", {
+  skip_if_crossref_api_down()
   dois_pensoft=c('10.3897/zookeys.594.8768', '10.3897/mycokeys.54.34571',
     '10.3897/phytokeys.99.26489', '10.3897/subtbiol.13.6719')
   a <- ftd_doi(dois_pensoft)
@@ -31,6 +33,7 @@ test_that("ftd_doi: pensoft", {
 })
 
 test_that("ftd_doi: frontiers", {
+  skip_if_crossref_api_down()
   # dois_frontiers=rcrossref::cr_members(1965, works=TRUE, limit=5)$data$doi
   # save(dois_frontiers, file="tests/testthat/dois/dois_frontiers.rda", version=2)
   load("dois/dois_frontiers.rda")
@@ -43,6 +46,7 @@ test_that("ftd_doi: frontiers", {
 })
 
 test_that("ftd_doi: PNAS", {
+  skip_if_crossref_api_down()
   # dois_pnas=rcrossref::cr_members(341, works=TRUE, limit=5)$data$doi
   # save(dois_pnas, file="tests/testthat/dois/dois_pnas.rda", version=2)
   load("dois/dois_pnas.rda")

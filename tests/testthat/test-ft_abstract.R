@@ -12,7 +12,7 @@ test_that("ft_abstract basic functionality works - PLOS", {
   }, preserve_exact_body_bytes = TRUE)
   
   expect_is(aa, "ft_abstract")
-  expect_named(aa, c('plos', 'scopus', 'ma', 'crossref', 'semanticscholar'))
+  expect_named(aa, c('crossref', 'plos', 'scopus', 'ma', 'semanticscholar'))
   expect_is(aa$plos, "list")
   expect_is(aa$plos[[1]], "list")
   expect_named(aa$plos[[1]], c('doi', 'abstract'))
@@ -74,7 +74,7 @@ test_that("ft_abstract basic functionality works - Crossref", {
   })
   
   expect_is(aa, "ft_abstract")
-  expect_named(aa, c('plos', 'scopus', 'ma', 'crossref', 'semanticscholar'))
+  expect_named(aa, c('crossref', 'plos', 'scopus', 'ma', 'semanticscholar'))
   expect_is(aa$crossref, "list")
   expect_is(aa$crossref[[1]], "list")
   expect_named(aa$crossref[[1]], c('id', 'abstract'))
@@ -113,4 +113,11 @@ test_that("ft_abstract curl options work", {
   expect_error(
     ft_abstract("10.5194/we-13-95-2013", from = "crossref", timeout_ms = 1),
     "[Tt]ime")
+})
+
+test_that("ft_abstract use a non-PLOS DOI with from=plos", {
+  skip_on_cran()
+  
+  a_ieee_doi <- "10.1109/TEM.2019.2914408"
+  expect_is(ft_abstract(a_ieee_doi, from = "plos"), "ft_abstract")
 })

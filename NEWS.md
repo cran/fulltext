@@ -1,3 +1,16 @@
+fulltext 2.0
+==============
+
+### MINOR IMPROVEMENTS
+
+* `ft_abstract()`: change default `from` value from "plos" to "crossref" (#235)
+
+### BUG FIXES
+
+* fix PLOS internals for `ft_abstract()` (#234)
+* fix how Miscrosoft Academic query was structured before being sent off - affecting `ft_search()` (#236)
+
+
 fulltext 1.7.0
 ==============
 
